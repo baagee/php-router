@@ -25,17 +25,14 @@ abstract class RouterAbstract implements RouterInterface
      */
     protected const ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'];
 
-    /*
+    /**
      * [
      *      '/path'=>[
      *          'methods'=>['get','post'],
      *          'callback'=>function(){}
      *      ]
      * ]
-     * @var array
-     */
-    /**
-     * @var array
+     * @var array 保存的路由规则
      */
     protected static $routes = [];
 
@@ -51,10 +48,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function __callStatic($name, $arguments)
     {
-        $method   = strtoupper($name);
-        $path     = strpos($arguments[0], '/') === 0 ? $arguments[0] : '/' . $arguments[0];
-        $callback = $arguments[1];
-        static::add($method, $path, $callback);
+        static::add($name, $arguments[0], $arguments[1]);
     }
 
     /**
@@ -66,10 +60,11 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function add($method, string $path, $callback)
     {
-        $path    = preg_replace('/\/+/', '/', $path);
+        $path    = preg_replace('/\/+/', '/', strpos($path, '/') === 0 ? $path : '/' . $path);
         $methods = array_map('strtoupper', is_array($method) ? $method : [$method]);
-        if (!empty(array_diff($methods, self::ALLOW_METHODS))) {
-            throw new \Exception(sprintf('未知的请求方法：%s', implode('/', $methods)));
+        $diff    = array_diff($methods, static::ALLOW_METHODS);
+        if (!empty($diff)) {
+            throw new \Exception(sprintf('不合法的请求方法[%s]', implode(', ', $diff)));
         }
         static::$routes[$path] = [
             'methods'  => $methods,
@@ -127,6 +122,7 @@ abstract class RouterAbstract implements RouterInterface
     }
 
     /**
+     * 具体的调用逻辑
      * @param $callback
      * @param $params
      * @return mixed
