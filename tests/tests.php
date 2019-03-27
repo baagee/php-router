@@ -1,22 +1,5 @@
-# php-router 简单路由
-php router library
+<?php
 
-### 安装
-`composer require baagee/php-router`
-
-### 使用
-
-支持常见的6中请求方法
-
-1. GET
-2. POST
-3. PUT
-4. DELETE
-5. OPTIONS
-6. HEAD
-
-示例代码：
-```php
 include_once __DIR__ . '/../vendor/autoload.php';
 
 // get请求 可以使用匿名函数
@@ -66,27 +49,3 @@ include_once __DIR__ . '/../vendor/autoload.php';
 });
 // 开始匹配路由并调用对应的回调方法
 \BaAGee\Router\Router::dispatch();
-```
-
-### 自定义调用方式
-```php
-include_once __DIR__ . '/../vendor/autoload.php';
-
-// 自定义自己的调用方式
-class MyRouter extends \BaAGee\Router\Base\RouterAbstract
-{
-    protected static function call($callback, $params)
-    {
-        // 获取控制器和方法
-        list($controller, $action) = explode('->', $callback);
-        // todo 判断类，方法是否存在...
-        $obj = new $controller();
-        // 调用
-        call_user_func_array([$obj, $action], $params);
-    }
-}
-
-MyRouter::get('/get', 'UserController->action');
-
-MyRouter::dispatch();
-```

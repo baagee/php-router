@@ -1,0 +1,24 @@
+{
+  "name": "baagee/php-router",
+  "description": "PHP Router library",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "PHP",
+    "router"
+  ],
+  "authors": [
+    {
+      "name": "BaAGee",
+      "email": "2274313786@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "BaAGee\\Router\\": "src/"
+    }
+  }
+}
