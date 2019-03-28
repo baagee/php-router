@@ -62,6 +62,11 @@ include_once __DIR__ . '/../vendor/autoload.php';
     http_response_code(404);
     echo '404啊';
 });
+
+\BaAGee\Router\Router::setMethodNotAllow(function () {
+    http_response_code(405);
+    echo '405啊';
+});
 // 添加路由 post请求
 \BaAGee\Router\Router::add('post', '/post2', function () {
     echo 'post2';

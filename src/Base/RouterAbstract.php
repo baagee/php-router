@@ -49,6 +49,11 @@ abstract class RouterAbstract implements RouterInterface
     protected static $notFound = null;
 
     /**
+     * @var null 405请求方法不允许
+     */
+    protected static $methodNotAllow = null;
+
+    /**
      * @param $name
      * @param $arguments
      * @throws \Exception
@@ -99,10 +104,7 @@ abstract class RouterAbstract implements RouterInterface
         if (!empty($diff)) {
             throw new \Exception(sprintf('[%s]存在不合法的请求方法[%s]', $path, implode(', ', $diff)));
         }
-        $cType = gettype($callback);
-        if (!in_array($cType, self::ALLOW_CALLBACK_TYPE)) {
-            throw new \Exception(sprintf('[%s]路由回调方法不合法，不允许[%s]类型，只允许[%s]类型', $path, $cType, implode(', ', self::ALLOW_CALLBACK_TYPE)));
-        }
+        self::checkCallbackType($callback);
         return compact('path', 'methods', 'callback');
     }
 
@@ -125,12 +127,38 @@ abstract class RouterAbstract implements RouterInterface
     }
 
     /**
-     * 设置路由找不到的处理
+     * 检查回调是否合法
      * @param $callback
+     * @throws \Exception
+     */
+    final protected static function checkCallbackType($callback)
+    {
+        $cType = gettype($callback);
+        if (!in_array($cType, self::ALLOW_CALLBACK_TYPE)) {
+            throw new \Exception(sprintf('路由回调方法不合法，不允许[%s]类型，只允许[%s]类型', $cType, implode(', ', self::ALLOW_CALLBACK_TYPE)));
+        }
+    }
+
+    /**
+     * 设置路由找不到的响应处理
+     * @param $callback
+     * @throws \Exception
      */
     final public static function setNotFound($callback)
     {
+        self::checkCallbackType($callback);
         static::$notFound = $callback;
+    }
+
+    /**
+     * 设置方法不允许的响应处理
+     * @param $callback
+     * @throws \Exception
+     */
+    final public static function setMethodNotAllow($callback)
+    {
+        self::checkCallbackType($callback);
+        static::$methodNotAllow = $callback;
     }
 
     /**
@@ -145,8 +173,7 @@ abstract class RouterAbstract implements RouterInterface
             if (in_array($requestMethod, $routerDetail['methods'])) {
                 static::call($routerDetail['callback'], [], $requestMethod, $routerDetail['other']);
             } else {
-                // 405
-                http_response_code(405);
+                self::responseMethodNotAllow();// 405
             }
             return;
         } else {
@@ -163,14 +190,22 @@ abstract class RouterAbstract implements RouterInterface
                         }
                         static::call($routerDetail['callback'], $matched, $requestMethod, $routerDetail['other']);
                     } else {
-                        // 405
-                        http_response_code(405);
+                        self::responseMethodNotAllow();// 405
                     }
                     return;
                 }
             }
         }
         // 404
+        self::responseNotFound();
+        return;
+    }
+
+    /**
+     * 响应404
+     */
+    final protected static function responseNotFound()
+    {
         if (static::$notFound !== null) {
             static::$routes = [];
             static::get($_SERVER['PATH_INFO'], static::$notFound);
@@ -179,7 +214,21 @@ abstract class RouterAbstract implements RouterInterface
         } else {
             http_response_code(404);
         }
-        return;
+    }
+
+    /**
+     * 响应405
+     */
+    final protected static function responseMethodNotAllow()
+    {
+        if (static::$methodNotAllow !== null) {
+            static::$routes = [];
+            static::get($_SERVER['PATH_INFO'], static::$methodNotAllow);
+            static::$methodNotAllow = null;
+            static::dispatch();
+        } else {
+            http_response_code(405);
+        }
     }
 
     /**
