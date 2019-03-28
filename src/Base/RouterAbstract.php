@@ -26,9 +26,15 @@ abstract class RouterAbstract implements RouterInterface
     protected const ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'];
 
     /**
+     * 路由回调允许的类型
+     */
+    protected const ALLOW_CALLBACK_TYPE = ['object', 'string', 'array'];
+
+    /**
+     * 格式
      * [
      *      '/path'=>[
-     *          'methods'=>['get','post'],
+     *          'methods'=>['GET','POST'],
      *          'callback'=>function(){},
      *          'other'=>[]
      *      ]
@@ -53,6 +59,48 @@ abstract class RouterAbstract implements RouterInterface
     }
 
     /**
+     * 批量添加路由
+     * @param array $routes
+     * @throws \Exception
+     */
+    final public static function batchAddRouter(array $routes)
+    {
+        $checkRoutes = [];
+        foreach ($routes as $path => $route) {
+            $res                       = self::checkRoute($path, $route['methods'], $route['callback']);
+            $checkRoutes[$res['path']] = [
+                'methods'  => $res['methods'],
+                'callback' => $res['callback'],
+                'other'    => (isset($route['other']) && !empty($route['other'])) ? $route['other'] : []
+            ];
+        }
+        static::$routes = $checkRoutes;
+    }
+
+    /**
+     * 检查路由是否合法
+     * @param string                $path     请求路径
+     * @param string|array          $methods  请求方法
+     * @param string|array|\Closure $callback 请求回调
+     * @return array
+     * @throws \Exception
+     */
+    private static function checkRoute($path, $methods, $callback)
+    {
+        $path    = preg_replace('/\/+/', '/', strpos($path, '/') === 0 ? $path : '/' . $path);
+        $methods = array_map('strtoupper', is_array($methods) ? $methods : [$methods]);
+        $diff    = array_diff($methods, static::ALLOW_METHODS);
+        if (!empty($diff)) {
+            throw new \Exception(sprintf('[%s]存在不合法的请求方法[%s]', $path, implode(', ', $diff)));
+        }
+        $cType = gettype($callback);
+        if (!in_array($cType, self::ALLOW_CALLBACK_TYPE)) {
+            throw new \Exception(sprintf('[%s]路由回调方法不合法，不允许[%s]类型，只允许[%s]类型', $path, $cType, implode(', ', self::ALLOW_CALLBACK_TYPE)));
+        }
+        return compact('path', 'methods', 'callback');
+    }
+
+    /**
      * 添加路由
      * @param string|array $method
      * @param string       $path
@@ -62,15 +110,10 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function add($method, string $path, $callback, $other = [])
     {
-        $path    = preg_replace('/\/+/', '/', strpos($path, '/') === 0 ? $path : '/' . $path);
-        $methods = array_map('strtoupper', is_array($method) ? $method : [$method]);
-        $diff    = array_diff($methods, static::ALLOW_METHODS);
-        if (!empty($diff)) {
-            throw new \Exception(sprintf('不合法的请求方法[%s]', implode(', ', $diff)));
-        }
+        $res                   = self::checkRoute($path, $method, $callback);
         static::$routes[$path] = [
-            'methods'  => $methods,
-            'callback' => $callback,
+            'methods'  => $res['methods'],
+            'callback' => $res['callback'],
             'other'    => $other
         ];
     }
