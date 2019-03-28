@@ -22,7 +22,12 @@ include_once __DIR__ . '/../vendor/autoload.php';
 // get请求 可以使用匿名函数
 \BaAGee\Router\Router::get('/get', function () {
     echo 'get';
-});
+}, [
+    // 第三个参数可以传其他的一些信息，比如可以传中间件
+    'middleware' => [
+        'CheckLogin', 'CheckPrivilege', 'GetPhpInputData'
+    ]
+]);
 // 可以使用@符号把控制器把action分离，注意控制器类名为完全限定类名
 \BaAGee\Router\Router::get('/user/(\d+)', 'User@info');
 // 或者使用数组指定具体的处理方法：[控制器，方法]
@@ -75,18 +80,33 @@ include_once __DIR__ . '/../vendor/autoload.php';
 // 自定义自己的调用方式
 class MyRouter extends \BaAGee\Router\Base\RouterAbstract
 {
-    protected static function call($callback, $params)
+    protected static function call($callback, $params, $other)
     {
+        var_dump($other);
         // 获取控制器和方法
         list($controller, $action) = explode('->', $callback);
         // todo 判断类，方法是否存在...
         $obj = new $controller();
-        // 调用
+        // todo 调用 中间件
+        var_dump($other['middleware']);
+        // 调用Action
         call_user_func_array([$obj, $action], $params);
     }
 }
 
-MyRouter::get('/get', 'UserController->action');
+MyRouter::get('/get', 'UserController->action', [
+    'middleware'     => [
+        'CheckLogin',
+        'CheckPrivilege'
+    ],
+    'otherRouteInfo' => [
+        '扒拉扒拉一堆...'
+    ]
+]);
 
 MyRouter::dispatch();
 ```
+
+### 注意
+
+`\BaAGee\Router\Router`类虽然定义路由时可以传第三个参数，但是在`call`方法中并没有使用`other`参数，这个属于个性化的参数，路由框架并不会帮你做，要想利用`other`参数，请参考自定义调用方式重新实现`call`方法，详情见`tests/test2.php`文件

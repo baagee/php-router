@@ -10,12 +10,12 @@ namespace BaAGee\Router\Base;
 
 /**
  * Class RouterAbstract
- * @method static get(string $route, callable $callback)
- * @method static post(string $route, Callable $callback)
- * @method static put(string $route, Callable $callback)
- * @method static delete(string $route, Callable $callback)
- * @method static options(string $route, Callable $callback)
- * @method static head(string $route, Callable $callback)
+ * @method static get(string $route, callable $callback, array $other = [])
+ * @method static post(string $route, Callable $callback, array $other = [])
+ * @method static put(string $route, Callable $callback, array $other = [])
+ * @method static delete(string $route, Callable $callback, array $other = [])
+ * @method static options(string $route, Callable $callback, array $other = [])
+ * @method static head(string $route, Callable $callback, array $other = [])
  * @package BaAGee\Router\Base
  */
 abstract class RouterAbstract implements RouterInterface
@@ -29,7 +29,8 @@ abstract class RouterAbstract implements RouterInterface
      * [
      *      '/path'=>[
      *          'methods'=>['get','post'],
-     *          'callback'=>function(){}
+     *          'callback'=>function(){},
+     *          'other'=>[]
      *      ]
      * ]
      * @var array 保存的路由规则
@@ -48,7 +49,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function __callStatic($name, $arguments)
     {
-        static::add($name, $arguments[0], $arguments[1]);
+        static::add($name, $arguments[0], $arguments[1], !empty($arguments[2]) ? $arguments[2] : []);
     }
 
     /**
@@ -56,9 +57,10 @@ abstract class RouterAbstract implements RouterInterface
      * @param string|array $method
      * @param string       $path
      * @param              $callback
+     * @param array        $other
      * @throws \Exception
      */
-    final public static function add($method, string $path, $callback)
+    final public static function add($method, string $path, $callback, $other = [])
     {
         $path    = preg_replace('/\/+/', '/', strpos($path, '/') === 0 ? $path : '/' . $path);
         $methods = array_map('strtoupper', is_array($method) ? $method : [$method]);
@@ -68,7 +70,8 @@ abstract class RouterAbstract implements RouterInterface
         }
         static::$routes[$path] = [
             'methods'  => $methods,
-            'callback' => $callback
+            'callback' => $callback,
+            'other'    => $other
         ];
     }
 
@@ -89,21 +92,21 @@ abstract class RouterAbstract implements RouterInterface
         $requestPath   = $_SERVER['PATH_INFO'];
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         if (in_array($requestPath, array_keys(static::$routes))) {
-            $methodAndCallback = static::$routes[$requestPath];
-            if (!in_array($requestMethod, $methodAndCallback['methods'])) {
+            $routerDetail = static::$routes[$requestPath];
+            if (!in_array($requestMethod, $routerDetail['methods'])) {
             } else {
-                static::call($methodAndCallback['callback'], []);
+                static::call($routerDetail['callback'], [], $routerDetail['other']);
                 return;
             }
         } else {
             // 正则
-            foreach (static::$routes as $path => $methodAndCallback) {
+            foreach (static::$routes as $path => $routerDetail) {
                 $res = preg_match('#^' . $path . '$#', $requestPath, $matched);
                 if ($res === 0 || $res === false) {
                 } else {
-                    if (in_array($requestMethod, $methodAndCallback['methods'])) {
+                    if (in_array($requestMethod, $routerDetail['methods'])) {
                         array_shift($matched);
-                        static::call($methodAndCallback['callback'], $matched);
+                        static::call($routerDetail['callback'], $matched, $routerDetail['other']);
                         return;
                     }
                 }
@@ -125,7 +128,8 @@ abstract class RouterAbstract implements RouterInterface
      * 具体的调用逻辑
      * @param $callback
      * @param $params
+     * @param $other
      * @return mixed
      */
-    abstract protected static function call($callback, $params);
+    abstract protected static function call($callback, $params, $other);
 }

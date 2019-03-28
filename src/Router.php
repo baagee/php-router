@@ -20,9 +20,10 @@ class Router extends RouterAbstract
      * 调用方法
      * @param $callback
      * @param $params
+     * @param $other
      * @throws \Exception
      */
-    protected static function call($callback, $params)
+    protected static function call($callback, $params, $other = [])
     {
         if ($callback instanceof \Closure) {
             call_user_func_array($callback, $params);

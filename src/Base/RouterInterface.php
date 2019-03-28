@@ -10,7 +10,7 @@ namespace BaAGee\Router\Base;
 
 interface RouterInterface
 {
-    public static function add($methods, string $path, $callback);
+    public static function add($methods, string $path, $callback, $other = []);
 
     public static function dispatch();
 

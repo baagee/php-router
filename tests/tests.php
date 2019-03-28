@@ -5,7 +5,12 @@ include_once __DIR__ . '/../vendor/autoload.php';
 // get请求 可以使用匿名函数
 \BaAGee\Router\Router::get('/get', function () {
     echo 'get';
-});
+}, [
+    // 第三个参数可以传其他的一些信息，比如可以传中间件
+    'middleware' => [
+        'CheckLogin', 'CheckPrivilege', 'GetPhpInputData'
+    ]
+]);
 // 可以使用@符号把控制器把action分离，注意控制器类名为完全限定类名
 \BaAGee\Router\Router::get('/user/(\d+)', 'User@info');
 // 或者使用数组指定具体的处理方法：[控制器，方法]
