@@ -136,11 +136,13 @@ abstract class RouterAbstract implements RouterInterface
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         if (in_array($requestPath, array_keys(static::$routes))) {
             $routerDetail = static::$routes[$requestPath];
-            if (!in_array($requestMethod, $routerDetail['methods'])) {
-            } else {
+            if (in_array($requestMethod, $routerDetail['methods'])) {
                 static::call($routerDetail['callback'], [], $routerDetail['other']);
-                return;
+            } else {
+                // 405
+                http_response_code(405);
             }
+            return;
         } else {
             // 正则
             foreach (static::$routes as $path => $routerDetail) {
@@ -150,8 +152,11 @@ abstract class RouterAbstract implements RouterInterface
                     if (in_array($requestMethod, $routerDetail['methods'])) {
                         array_shift($matched);
                         static::call($routerDetail['callback'], $matched, $routerDetail['other']);
-                        return;
+                    } else {
+                        // 405
+                        http_response_code(405);
                     }
+                    return;
                 }
             }
         }
