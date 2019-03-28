@@ -158,7 +158,7 @@ abstract class RouterAbstract implements RouterInterface
         // 404
         if (static::$notFound !== null) {
             static::$routes = [];
-            static::get($_SERVER['REQUEST_URI'], static::$notFound);
+            static::get($_SERVER['PATH_INFO'], static::$notFound);
             static::$notFound = null;
             static::dispatch();
         } else {
