@@ -87,8 +87,14 @@ abstract class RouterAbstract implements RouterInterface
      */
     private static function checkRoute($path, $methods, $callback)
     {
-        $path    = preg_replace('/\/+/', '/', strpos($path, '/') === 0 ? $path : '/' . $path);
-        $methods = array_map('strtoupper', is_array($methods) ? $methods : [$methods]);
+        $path = preg_replace('/\/+/', '/', strpos($path, '/') === 0 ? $path : '/' . $path);
+        $res1 = strpos($path, '[') !== false && strpos($path, ']') !== false;
+        $res2 = strpos($path, '{') !== false && strpos($path, '}') !== false;
+        if ($res1 || $res2) {
+            // 路由规则使用了赠正则表达式，转化为标准正则
+            $path = preg_replace('`\{(\S+?)\}`', '(?<$1>\S+?)', str_replace(['[', ']', '/'], ['(?:', ')?', '\/'], $path));
+        }
+        $methods = array_map('strtoupper', is_array($methods) ? $methods : explode('|', $methods));
         $diff    = array_diff($methods, static::ALLOW_METHODS);
         if (!empty($diff)) {
             throw new \Exception(sprintf('[%s]存在不合法的请求方法[%s]', $path, implode(', ', $diff)));
@@ -110,8 +116,8 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function add($method, string $path, $callback, $other = [])
     {
-        $res                   = self::checkRoute($path, $method, $callback);
-        static::$routes[$path] = [
+        $res                          = self::checkRoute($path, $method, $callback);
+        static::$routes[$res['path']] = [
             'methods'  => $res['methods'],
             'callback' => $res['callback'],
             'other'    => $other
@@ -137,7 +143,7 @@ abstract class RouterAbstract implements RouterInterface
         if (in_array($requestPath, array_keys(static::$routes))) {
             $routerDetail = static::$routes[$requestPath];
             if (in_array($requestMethod, $routerDetail['methods'])) {
-                static::call($routerDetail['callback'], [], $routerDetail['other']);
+                static::call($routerDetail['callback'], [], $requestMethod, $routerDetail['other']);
             } else {
                 // 405
                 http_response_code(405);
@@ -146,12 +152,16 @@ abstract class RouterAbstract implements RouterInterface
         } else {
             // 正则
             foreach (static::$routes as $path => $routerDetail) {
-                $res = preg_match('#^' . $path . '$#', $requestPath, $matched);
+                $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
                 if ($res === 0 || $res === false) {
                 } else {
                     if (in_array($requestMethod, $routerDetail['methods'])) {
-                        array_shift($matched);
-                        static::call($routerDetail['callback'], $matched, $routerDetail['other']);
+                        foreach ($matched as $k => $v) {
+                            if (!is_string($k)) {
+                                unset($matched[$k]);
+                            }
+                        }
+                        static::call($routerDetail['callback'], $matched, $requestMethod, $routerDetail['other']);
                     } else {
                         // 405
                         http_response_code(405);
@@ -173,11 +183,11 @@ abstract class RouterAbstract implements RouterInterface
     }
 
     /**
-     * 具体的调用逻辑
-     * @param $callback
-     * @param $params
-     * @param $other
-     * @return mixed
+     * 具体的调用方法
+     * @param string|\Closure $callback 路由回调方法
+     * @param array           $params   请求路由中的参数
+     * @param string          $method   请求方法
+     * @param array           $other    其他路由辅助信息
      */
-    abstract protected static function call($callback, $params, $other);
+    abstract protected static function call($callback, $params, $method, $other);
 }

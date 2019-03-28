@@ -12,12 +12,14 @@ include_once __DIR__ . '/../vendor/autoload.php';
     ]
 ]);
 // 可以使用@符号把控制器把action分离，注意控制器类名为完全限定类名
-\BaAGee\Router\Router::get('/user/(\d+)', 'User@info');
+// {id}是提取参数，保存到$params['id']里面
+\BaAGee\Router\Router::get('/user/{id}', 'User@info');
 // 或者使用数组指定具体的处理方法：[控制器，方法]
-\BaAGee\Router\Router::get('/account/(\d+)', ['Account', 'info']);
+\BaAGee\Router\Router::get('/account/{id}', ['Account', 'info']);
 // 可以使用正则表达式定义路由匹配规则
-\BaAGee\Router\Router::get('/abc/(\w+)/(.*?)', function ($a, $b) {
-    var_dump($a, $b);
+// []包起来的说明这个值可选
+\BaAGee\Router\Router::get('/abc/{id}[/{name}]', function ($params) {
+    var_dump($params);
 });
 // 只允许post请求
 \BaAGee\Router\Router::post('/post', function () {

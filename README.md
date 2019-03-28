@@ -18,7 +18,6 @@ php router library
 示例代码：
 ```php
 include_once __DIR__ . '/../vendor/autoload.php';
-
 // get请求 可以使用匿名函数
 \BaAGee\Router\Router::get('/get', function () {
     echo 'get';
@@ -29,12 +28,14 @@ include_once __DIR__ . '/../vendor/autoload.php';
     ]
 ]);
 // 可以使用@符号把控制器把action分离，注意控制器类名为完全限定类名
-\BaAGee\Router\Router::get('/user/(\d+)', 'User@info');
+// {id}是提取参数，保存到$params['id']里面
+\BaAGee\Router\Router::get('/user/{id}', 'User@info');
 // 或者使用数组指定具体的处理方法：[控制器，方法]
-\BaAGee\Router\Router::get('/account/(\d+)', ['Account', 'info']);
+\BaAGee\Router\Router::get('/account/{id}', ['Account', 'info']);
 // 可以使用正则表达式定义路由匹配规则
-\BaAGee\Router\Router::get('/abc/(\w+)/(.*?)', function ($a, $b) {
-    var_dump($a, $b);
+// []包起来的说明这个值可选
+\BaAGee\Router\Router::get('/abc/{id}[/{name}]', function ($params) {
+    var_dump($params);
 });
 // 只允许post请求
 \BaAGee\Router\Router::post('/post', function () {
@@ -75,30 +76,37 @@ include_once __DIR__ . '/../vendor/autoload.php';
 ### 批量添加路由
 ```php
 include_once __DIR__ . '/../vendor/autoload.php';
-
 // 定义路由规则
 $routes = [
-    '/get' => [
+    '/get/{id}' => [
         'methods'  => 'get',// 允许的请求方法
-        'callback' => function () {// 具体的回调方法
+        'callback' => function ($params) {// 具体的回调方法
             echo 'get';
+            var_dump($params);
         },
         //  其他附加信息
         'other'    => ['other', 'info']
     ],
 
-    '/post/(\d+)' => [
+    '/post[/{name}][/{id}]' => [
         'methods'  => ['post'],
-        'callback' => function ($id) {
-            echo 'post id=' . $id;
+        'callback' => function ($params) {
+            echo 'post';
+            var_dump($params);
         },
         'other'    => ['other', 'info']
     ],
 
-    '/get/post' => [
+    '/getpost' => [
         'methods'  => ['post', 'get'],
         'callback' => function () {
             echo 'post get';
+        }
+    ],
+    '/getput' => [
+        'methods'  => 'get|put',
+        'callback' => function () {
+            echo 'put get';
         }
     ],
 ];
@@ -110,11 +118,18 @@ $routes = [
 ### 自定义调用方式
 ```php
 include_once __DIR__ . '/../vendor/autoload.php';
-
 // 自定义自己的调用方式
 class MyRouter extends \BaAGee\Router\Base\RouterAbstract
 {
-    protected static function call($callback, $params, $other)
+    /**
+     * 具体的调用方法
+     * @param string|\Closure $callback 路由回调方法
+     * @param array           $params   请求路由中的参数
+     * @param string          $method   请求方法
+     * @param array           $other    其他路由辅助信息
+     * @throws \Exception
+     */
+    protected static function call($callback, $params, $method, $other)
     {
         var_dump($other);
         // 获取控制器和方法
@@ -128,7 +143,7 @@ class MyRouter extends \BaAGee\Router\Base\RouterAbstract
     }
 }
 
-MyRouter::get('/get', 'UserController->action', [
+MyRouter::get('/get[/{id}]', 'UserController->action', [
     'middleware'     => [
         'CheckLogin',
         'CheckPrivilege'

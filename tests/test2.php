@@ -5,7 +5,15 @@ include_once __DIR__ . '/../vendor/autoload.php';
 // 自定义自己的调用方式
 class MyRouter extends \BaAGee\Router\Base\RouterAbstract
 {
-    protected static function call($callback, $params, $other)
+    /**
+     * 具体的调用方法
+     * @param string|\Closure $callback 路由回调方法
+     * @param array           $params   请求路由中的参数
+     * @param string          $method   请求方法
+     * @param array           $other    其他路由辅助信息
+     * @throws \Exception
+     */
+    protected static function call($callback, $params, $method, $other)
     {
         var_dump($other);
         // 获取控制器和方法
@@ -19,7 +27,7 @@ class MyRouter extends \BaAGee\Router\Base\RouterAbstract
     }
 }
 
-MyRouter::get('/get', 'UserController->action', [
+MyRouter::get('/get[/{id}]', 'UserController->action', [
     'middleware'     => [
         'CheckLogin',
         'CheckPrivilege'
