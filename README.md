@@ -116,7 +116,7 @@ $routes = [
     ],
 ];
 // 批量添加路由
-\BaAGee\Router\Router::batchAddRouter($routes);
+\BaAGee\Router\Router::batchAdd($routes);
 \BaAGee\Router\Router::dispatch();
 ```
 
