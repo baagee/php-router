@@ -68,18 +68,11 @@ abstract class RouterAbstract implements RouterInterface
      * @param array $routes
      * @throws \Exception
      */
-    final public static function batchAddRouter(array $routes)
+    final public static function batchAdd(array $routes)
     {
-        $checkRoutes = [];
         foreach ($routes as $path => $route) {
-            $res                       = self::checkRoute($path, $route['methods'], $route['callback']);
-            $checkRoutes[$res['path']] = [
-                'methods'  => $res['methods'],
-                'callback' => $res['callback'],
-                'other'    => (isset($route['other']) && !empty($route['other'])) ? $route['other'] : []
-            ];
+            self::add($route['methods'], $path, $route['callback'], (isset($route['other']) && !empty($route['other'])) ? $route['other'] : []);
         }
-        static::$routes = $checkRoutes;
     }
 
     /**
