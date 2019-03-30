@@ -11,11 +11,19 @@ class App
 {
     public function test1($a)
     {
+        var_dump($a);
         echo __FUNCTION__;
     }
 
     public function test2($a)
     {
+        var_dump($a);
+        echo __FUNCTION__;
+    }
+
+    public function test3($a)
+    {
+        var_dump($a);
         echo __FUNCTION__;
     }
 }
@@ -25,7 +33,7 @@ function addRouter()
 {
     \BaAGee\Router\Router::get('/get/test1', 'App@test1');
     \BaAGee\Router\Router::get('/get/test2', 'App@test2');
-    \BaAGee\Router\Router::get('/get/test3', 'App@test2');
+    \BaAGee\Router\Router::get('/get/{name}', 'App@test3');
 }
 
 // 是否开发模式

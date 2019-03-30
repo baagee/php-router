@@ -1,5 +1,5 @@
 <?php
-// time:2019-03-30 16:01:08
+// time:2019-03-30 16:04:13
 return array (
   '/get/test1' => 
   array (
@@ -23,13 +23,13 @@ return array (
     array (
     ),
   ),
-  '/get/test3' => 
+  '\\/get\\/(?<name>\\S+?)' => 
   array (
     'methods' => 
     array (
       0 => 'GET',
     ),
-    'callback' => 'App@test2',
+    'callback' => 'App@test3',
     'other' => 
     array (
     ),
