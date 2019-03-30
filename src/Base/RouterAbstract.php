@@ -71,7 +71,7 @@ abstract class RouterAbstract implements RouterInterface
     final public static function batchAdd(array $routes)
     {
         foreach ($routes as $path => $route) {
-            self::add($route['methods'], $path, $route['callback'], (isset($route['other']) && !empty($route['other'])) ? $route['other'] : []);
+            self::add($route[0], $path, $route[1], (isset($route[2]) && !empty($route[2])) ? $route[2] : []);
         }
     }
 
@@ -159,7 +159,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function dispatch()
     {
-        $requestPath   = $_SERVER['PATH_INFO'];
+        $requestPath   = empty($_SERVER['PATH_INFO']) ? '/' : $_SERVER['PATH_INFO'];
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         if (in_array($requestPath, array_keys(static::$routes))) {
             $routerDetail = static::$routes[$requestPath];
