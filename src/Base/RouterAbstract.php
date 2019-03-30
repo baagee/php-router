@@ -31,6 +31,11 @@ abstract class RouterAbstract implements RouterInterface
     protected const ALLOW_CALLBACK_TYPE = ['object', 'string', 'array'];
 
     /**
+     * @var string 路由缓存文件
+     */
+    protected static $cacheFile = '';
+
+    /**
      * 格式
      * [
      *      '/path'=>[
@@ -61,6 +66,36 @@ abstract class RouterAbstract implements RouterInterface
     final public static function __callStatic($name, $arguments)
     {
         static::add($name, $arguments[0], $arguments[1], !empty($arguments[2]) ? $arguments[2] : []);
+    }
+
+    /**
+     * 设置一个路由缓存路径，返回缓存文件是否存在
+     * @param $path
+     * @return bool
+     * @throws \Exception
+     */
+    public static function setCachePath($path)
+    {
+        $path = realpath($path);
+        if (!is_dir($path) || !is_writeable($path)) {
+            if (!@mkdir($path, 0755, true)) {
+                throw new \Exception('创建文件夹【' . $path . '】失败');
+            }
+        }
+        self::$cacheFile = $path . DIRECTORY_SEPARATOR . 'routes.php';
+        if (is_file(self::$cacheFile)) {
+            self::$routes = include_once self::$cacheFile;
+            return true;
+        } else {
+            register_shutdown_function(function () {
+                if (self::$cacheFile) {
+                    $code = '<?php' . PHP_EOL . '// time:' . date('Y-m-d H:i:s') . PHP_EOL .
+                        'return ' . var_export(self::$routes, true) . ';';
+                    file_put_contents(self::$cacheFile, $code);
+                }
+            });
+            return false;
+        }
     }
 
     /**
