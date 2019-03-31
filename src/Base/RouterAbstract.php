@@ -31,6 +31,11 @@ abstract class RouterAbstract implements RouterInterface
     protected const ALLOW_CALLBACK_TYPE = ['object', 'string', 'array'];
 
     /**
+     * @var string 路由缓存文件
+     */
+    protected static $cacheFile = '';
+
+    /**
      * 格式
      * [
      *      '/path'=>[
@@ -64,6 +69,36 @@ abstract class RouterAbstract implements RouterInterface
     }
 
     /**
+     * 设置一个路由缓存路径，返回缓存文件是否存在
+     * @param $path
+     * @return bool
+     * @throws \Exception
+     */
+    final public static function setCachePath($path)
+    {
+        $path = realpath($path);
+        if (!is_dir($path) || !is_writeable($path)) {
+            if (!@mkdir($path, 0755, true)) {
+                throw new \Exception('创建文件夹【' . $path . '】失败');
+            }
+        }
+        static::$cacheFile = $path . DIRECTORY_SEPARATOR . 'routes.php';
+        if (is_file(static::$cacheFile)) {
+            static::$routes = include_once static::$cacheFile;
+            return true;
+        } else {
+            register_shutdown_function(function () {
+                if (static::$cacheFile) {
+                    $code = '<?php' . PHP_EOL . '// time:' . date('Y-m-d H:i:s') . PHP_EOL .
+                        'return ' . var_export(static::$routes, true) . ';';
+                    file_put_contents(static::$cacheFile, $code);
+                }
+            });
+            return false;
+        }
+    }
+
+    /**
      * 批量添加路由
      * @param array $routes
      * @throws \Exception
@@ -71,7 +106,7 @@ abstract class RouterAbstract implements RouterInterface
     final public static function batchAdd(array $routes)
     {
         foreach ($routes as $path => $route) {
-            self::add($route[0], $path, $route[1], (isset($route[2]) && !empty($route[2])) ? $route[2] : []);
+            static::add($route[0], $path, $route[1], (isset($route[2]) && !empty($route[2])) ? $route[2] : []);
         }
     }
 
@@ -97,7 +132,7 @@ abstract class RouterAbstract implements RouterInterface
         if (!empty($diff)) {
             throw new \Exception(sprintf('[%s]存在不合法的请求方法[%s]', $path, implode(', ', $diff)));
         }
-        self::checkCallbackType($callback);
+        static::checkCallbackType($callback);
         return compact('path', 'methods', 'callback');
     }
 
@@ -111,7 +146,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function add($method, string $path, $callback, $other = [])
     {
-        $res                          = self::checkRoute($path, $method, $callback);
+        $res                          = static::checkRoute($path, $method, $callback);
         static::$routes[$res['path']] = [
             'methods'  => $res['methods'],
             'callback' => $res['callback'],
@@ -127,8 +162,8 @@ abstract class RouterAbstract implements RouterInterface
     final protected static function checkCallbackType($callback)
     {
         $cType = gettype($callback);
-        if (!in_array($cType, self::ALLOW_CALLBACK_TYPE)) {
-            throw new \Exception(sprintf('路由回调方法不合法，不允许[%s]类型，只允许[%s]类型', $cType, implode(', ', self::ALLOW_CALLBACK_TYPE)));
+        if (!in_array($cType, static::ALLOW_CALLBACK_TYPE)) {
+            throw new \Exception(sprintf('路由回调方法不合法，不允许[%s]类型，只允许[%s]类型', $cType, implode(', ', static::ALLOW_CALLBACK_TYPE)));
         }
     }
 
@@ -139,7 +174,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function setNotFound($callback)
     {
-        self::checkCallbackType($callback);
+        static::checkCallbackType($callback);
         static::$notFound = $callback;
     }
 
@@ -150,7 +185,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function setMethodNotAllow($callback)
     {
-        self::checkCallbackType($callback);
+        static::checkCallbackType($callback);
         static::$methodNotAllow = $callback;
     }
 
@@ -166,7 +201,7 @@ abstract class RouterAbstract implements RouterInterface
             if (in_array($requestMethod, $routerDetail['methods'])) {
                 static::call($routerDetail['callback'], [], $requestMethod, $routerDetail['other']);
             } else {
-                self::responseMethodNotAllow();// 405
+                static::responseMethodNotAllow();// 405
             }
             return;
         } else {
@@ -183,14 +218,14 @@ abstract class RouterAbstract implements RouterInterface
                         }
                         static::call($routerDetail['callback'], $matched, $requestMethod, $routerDetail['other']);
                     } else {
-                        self::responseMethodNotAllow();// 405
+                        static::responseMethodNotAllow();// 405
                     }
                     return;
                 }
             }
         }
         // 404
-        self::responseNotFound();
+        static::responseNotFound();
         return;
     }
 

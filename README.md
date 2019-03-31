@@ -160,6 +160,50 @@ MyRouter::get('/get[/{id}]', 'UserController->action', [
 MyRouter::dispatch();
 ```
 
+### 路由缓存
+
+当路由比较多时，每次请求时，add路由会稍微耗时，可以使用缓存来跳过每次请求的路由初始化
+
+```php
+include_once __DIR__ . '/../vendor/autoload.php';
+
+class App
+{
+    public function test1($a)
+    {
+        echo __FUNCTION__;
+    }
+
+    public function test2($a)
+    {
+        echo __FUNCTION__;
+    }
+}
+
+// 添加路由的方法
+function addRouter()
+{
+    \BaAGee\Router\Router::get('/get/test1', 'App@test1');
+    \BaAGee\Router\Router::get('/get/test2', 'App@test2');
+    \BaAGee\Router\Router::get('/get/test3', 'App@test2');
+}
+
+// 是否开发模式
+$isDebug = false;
+// 如果不是开发模式(false)，设置一个路由缓存路径，
+//      如果缓存文件存在，会返回true，直接跳过，执行dispatch
+//      如果缓存文件不存在，会返回false,然后添加路由，最后执行dispatch，
+//      请求结束时将路由信息写入缓存文件，下次执行时文件存在，返回true，
+//      跳过添加路由，直接执行dispatch
+// 如果是开发模式(true)，每次都走添加路由的方法，然后执行dispatch
+if ($isDebug || \BaAGee\Router\Router::setCachePath(__DIR__ . '/cache') === false) {
+    echo '没有缓存';
+    addRouter();
+}
+
+\BaAGee\Router\Router::dispatch();
+```
+
 ### 注意
 
 `\BaAGee\Router\Router`类虽然定义路由时可以传第三个参数，但是在`call`方法中并没有使用`other`参数，这个属于个性化的参数，路由框架并不会帮你做，要想利用`other`参数，请参考自定义调用方式重新实现`call`方法，详情见`tests/test2.php`文件
