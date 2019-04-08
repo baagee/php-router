@@ -46,7 +46,10 @@ abstract class RouterAbstract implements RouterInterface
      * ]
      * @var array 保存的路由规则
      */
-    protected static $routes = [];
+    protected static $routes = [
+        'static' => [],//静态路由
+        'regexp' => []// 正则表达式路由
+    ];
 
     /**
      * @var null 404路由找不到的处理
@@ -124,8 +127,12 @@ abstract class RouterAbstract implements RouterInterface
         $res1 = strpos($path, '[') !== false && strpos($path, ']') !== false;
         $res2 = strpos($path, '{') !== false && strpos($path, '}') !== false;
         if ($res1 || $res2) {
-            // 路由规则使用了赠正则表达式，转化为标准正则
-            $path = preg_replace('`\{(\S+?)\}`', '(?<$1>\S+?)', str_replace(['[', ']', '/'], ['(?:', ')?', '\/'], $path));
+            // 路由规则使用了正则表达式，转化为标准正则
+            $path     = preg_replace('`\{(\S+?)\}`', '(?<$1>\S+?)', str_replace(['[', ']', '/'], ['(?:', ')?', '\/'], $path));
+            $isStatic = false;
+        } else {
+            // 没有正则表达式
+            $isStatic = true;
         }
         $methods = array_map('strtoupper', is_array($methods) ? $methods : explode('|', $methods));
         $diff    = array_diff($methods, static::ALLOW_METHODS);
@@ -133,7 +140,7 @@ abstract class RouterAbstract implements RouterInterface
             throw new \Exception(sprintf('[%s]存在不合法的请求方法[%s]', $path, implode(', ', $diff)));
         }
         static::checkCallbackType($callback);
-        return compact('path', 'methods', 'callback');
+        return compact('path', 'methods', 'callback', 'isStatic');
     }
 
     /**
@@ -146,12 +153,27 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function add($method, string $path, $callback, $other = [])
     {
-        $res                          = static::checkRoute($path, $method, $callback);
-        static::$routes[$res['path']] = [
-            'methods'  => $res['methods'],
-            'callback' => $res['callback'],
-            'other'    => $other
-        ];
+        $res = static::checkRoute($path, $method, $callback);
+        if ($res['isStatic']) {
+            static::$routes['static'][$res['path']] = [
+                'methods'  => $res['methods'],
+                'callback' => $res['callback'],
+                'other'    => $other
+            ];
+        } else {
+            // 正则表达式
+            $char = $res['path']{2};
+            $dd   = preg_match('/[a-zA-Z]/', $char);
+            if ($dd === false || $dd === 0) {
+                // 没有匹配到
+                $char = '/';
+            }
+            static::$routes['regexp'][$char][$res['path']] = [
+                'methods'  => $res['methods'],
+                'callback' => $res['callback'],
+                'other'    => $other
+            ];
+        }
     }
 
     /**
@@ -196,8 +218,8 @@ abstract class RouterAbstract implements RouterInterface
     {
         $requestPath   = empty($_SERVER['PATH_INFO']) ? '/' : $_SERVER['PATH_INFO'];
         $requestMethod = $_SERVER['REQUEST_METHOD'];
-        if (in_array($requestPath, array_keys(static::$routes))) {
-            $routerDetail = static::$routes[$requestPath];
+        if (array_key_exists($requestPath, static::$routes['static'])) {
+            $routerDetail = static::$routes['static'][$requestPath];
             if (in_array($requestMethod, $routerDetail['methods'])) {
                 static::call($routerDetail['callback'], [], $requestMethod, $routerDetail['other']);
             } else {
@@ -206,7 +228,13 @@ abstract class RouterAbstract implements RouterInterface
             return;
         } else {
             // 正则
-            foreach (static::$routes as $path => $routerDetail) {
+            $dd = $requestPath{1};
+            if (isset(static::$routes['regexp'][$dd])) {
+                $foreach = array_merge(static::$routes['regexp'][$dd], static::$routes['regexp']['/'] ?? []);
+            } else {
+                $foreach = static::$routes['regexp']['/'];
+            }
+            foreach ($foreach as $path => $routerDetail) {
                 $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
                 if ($res === 0 || $res === false) {
                 } else {

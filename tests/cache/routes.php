@@ -1,37 +1,60 @@
 <?php
-// time:2019-03-30 16:04:13
+// time:2019-04-08 08:30:16
 return array (
-  '/get/test1' => 
+  'static' => 
   array (
-    'methods' => 
+    '/get/test1' => 
     array (
-      0 => 'GET',
+      'methods' => 
+      array (
+        0 => 'GET',
+      ),
+      'callback' => 'App@test1',
+      'other' => 
+      array (
+      ),
     ),
-    'callback' => 'App@test1',
-    'other' => 
+    '/get/test2' => 
     array (
+      'methods' => 
+      array (
+        0 => 'GET',
+      ),
+      'callback' => 'App@test2',
+      'other' => 
+      array (
+      ),
     ),
   ),
-  '/get/test2' => 
+  'regexp' => 
   array (
-    'methods' => 
+    'g' => 
     array (
-      0 => 'GET',
+      '\\/get\\/(?<name>\\S+?)' => 
+      array (
+        'methods' => 
+        array (
+          0 => 'GET',
+        ),
+        'callback' => 'App@test3',
+        'other' => 
+        array (
+        ),
+      ),
     ),
-    'callback' => 'App@test2',
-    'other' => 
+    '/' => 
     array (
-    ),
-  ),
-  '\\/get\\/(?<name>\\S+?)' => 
-  array (
-    'methods' => 
-    array (
-      0 => 'GET',
-    ),
-    'callback' => 'App@test3',
-    'other' => 
-    array (
+      '\\/(?:(?<aaa>\\S+?))?' => 
+      array (
+        'methods' => 
+        array (
+          0 => 'GET',
+        ),
+        'callback' => 'App@test3',
+        'other' => 
+        array (
+        ),
+      ),
     ),
   ),
 );
