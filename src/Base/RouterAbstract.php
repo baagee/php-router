@@ -79,7 +79,9 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function setCachePath($path)
     {
-        $path = realpath($path);
+        if ($path{0} !== DIRECTORY_SEPARATOR) {
+            $path = realpath($path);
+        }
         if (!is_dir($path) || !is_writeable($path)) {
             if (!@mkdir($path, 0755, true)) {
                 throw new \Exception('创建文件夹【' . $path . '】失败');
@@ -232,7 +234,7 @@ abstract class RouterAbstract implements RouterInterface
             if (isset(static::$routes['regexp'][$dd])) {
                 $foreach = array_merge(static::$routes['regexp'][$dd], static::$routes['regexp']['/'] ?? []);
             } else {
-                $foreach = static::$routes['regexp']['/'];
+                $foreach = static::$routes['regexp']['/'] ?? [];
             }
             foreach ($foreach as $path => $routerDetail) {
                 $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
