@@ -34,6 +34,7 @@ function addRouter()
     \BaAGee\Router\Router::get('/get/test1', 'App@test1');
     \BaAGee\Router\Router::get('/get/test2', 'App@test2');
     \BaAGee\Router\Router::get('/get/{name}', 'App@test3');
+    \BaAGee\Router\Router::get('/[{aaa}]', 'App@test3');
 }
 
 // 是否开发模式
