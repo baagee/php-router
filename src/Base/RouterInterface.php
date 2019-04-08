@@ -15,4 +15,6 @@ interface RouterInterface
     public static function dispatch();
 
     public static function setNotFound($callback);
+
+    public static function setMethodNotAllow($callback);
 }
