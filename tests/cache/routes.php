@@ -1,26 +1,26 @@
 <?php
-// time:2019-04-08 08:30:16
+// time:2019-04-10 05:53:01
 return array(
     'static' =>
         array(
             '/get/test1' =>
                 array(
-                    'methods'  =>
+                    0 =>
                         array(
                             0 => 'GET',
                         ),
-                    'callback' => 'App@test1',
-                    'other'    =>
+                    1 => 'App@test1',
+                    2 =>
                         array(),
                 ),
             '/get/test2' =>
                 array(
-                    'methods'  =>
+                    0 =>
                         array(
                             0 => 'GET',
                         ),
-                    'callback' => 'App@test2',
-                    'other'    =>
+                    1 => 'App@test2',
+                    2 =>
                         array(),
                 ),
         ),
@@ -30,12 +30,12 @@ return array(
                 array(
                     '\\/get\\/(?<name>\\S+?)' =>
                         array(
-                            'methods'  =>
+                            0 =>
                                 array(
                                     0 => 'GET',
                                 ),
-                            'callback' => 'App@test3',
-                            'other'    =>
+                            1 => 'App@test3',
+                            2 =>
                                 array(),
                         ),
                 ),
@@ -43,12 +43,12 @@ return array(
                 array(
                     '\\/(?:(?<aaa>\\S+?))?' =>
                         array(
-                            'methods'  =>
+                            0 =>
                                 array(
                                     0 => 'GET',
                                 ),
-                            'callback' => 'App@test3',
-                            'other'    =>
+                            1 => 'App@test3',
+                            2 =>
                                 array(),
                         ),
                 ),

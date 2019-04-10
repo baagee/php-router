@@ -36,14 +36,6 @@ abstract class RouterAbstract implements RouterInterface
     protected static $cacheFile = '';
 
     /**
-     * 格式
-     * [
-     *      '/path'=>[
-     *          'methods'=>['GET','POST'],
-     *          'callback'=>function(){},
-     *          'other'=>[]
-     *      ]
-     * ]
      * @var array 保存的路由规则
      */
     protected static $routes = [
@@ -156,12 +148,9 @@ abstract class RouterAbstract implements RouterInterface
     final public static function add($method, string $path, $callback, $other = [])
     {
         $res = static::checkRoute($path, $method, $callback);
+        $arr = [$res['methods'], $res['callback'], $other];
         if ($res['isStatic']) {
-            static::$routes['static'][$res['path']] = [
-                'methods'  => $res['methods'],
-                'callback' => $res['callback'],
-                'other'    => $other
-            ];
+            static::$routes['static'][$res['path']] = $arr;
         } else {
             // 正则表达式
             $char = $res['path']{2};
@@ -170,11 +159,7 @@ abstract class RouterAbstract implements RouterInterface
                 // 没有匹配到
                 $char = '/';
             }
-            static::$routes['regexp'][$char][$res['path']] = [
-                'methods'  => $res['methods'],
-                'callback' => $res['callback'],
-                'other'    => $other
-            ];
+            static::$routes['regexp'][$char][$res['path']] = $arr;
         }
     }
 
@@ -222,8 +207,8 @@ abstract class RouterAbstract implements RouterInterface
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         if (array_key_exists($requestPath, static::$routes['static'])) {
             $routerDetail = static::$routes['static'][$requestPath];
-            if (in_array($requestMethod, $routerDetail['methods'])) {
-                static::call($routerDetail['callback'], [], $requestMethod, $routerDetail['other']);
+            if (in_array($requestMethod, $routerDetail[0])) {
+                static::call($routerDetail[1], [], $requestMethod, $routerDetail[2]);
             } else {
                 static::responseMethodNotAllow();// 405
             }
@@ -240,13 +225,13 @@ abstract class RouterAbstract implements RouterInterface
                 $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
                 if ($res === 0 || $res === false) {
                 } else {
-                    if (in_array($requestMethod, $routerDetail['methods'])) {
+                    if (in_array($requestMethod, $routerDetail[0])) {
                         foreach ($matched as $k => $v) {
                             if (!is_string($k)) {
                                 unset($matched[$k]);
                             }
                         }
-                        static::call($routerDetail['callback'], $matched, $requestMethod, $routerDetail['other']);
+                        static::call($routerDetail[1], $matched, $requestMethod, $routerDetail[2]);
                     } else {
                         static::responseMethodNotAllow();// 405
                     }
