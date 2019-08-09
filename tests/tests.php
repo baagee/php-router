@@ -2,9 +2,14 @@
 
 include_once __DIR__ . '/../vendor/autoload.php';
 
-// get请求 可以使用匿名函数
-\BaAGee\Router\Router::get('/get', function () {
+// get请求 可以使用匿名函数 http://127.0.0.1:9090/tests.php/get/userinfo.json
+\BaAGee\Router\Router::get('/get[/{name}\.{ext}]', function ($params) {
     echo 'get';
+    var_dump($params);
+    /*array (size=2)
+      'name' => string 'userinfo' (length=8)
+      'ext' => string 'json' (length=4)
+    get*/
 }, [
     // 第三个参数可以传其他的一些信息，比如可以传中间件
     'middleware' => [
