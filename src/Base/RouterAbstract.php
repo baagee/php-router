@@ -85,10 +85,14 @@ abstract class RouterAbstract implements RouterInterface
             return true;
         } else {
             register_shutdown_function(function () {
-                if (static::$cacheFile) {
-                    $code = '<?php' . PHP_EOL . '// time:' . date('Y-m-d H:i:s') . PHP_EOL .
-                        'return ' . var_export(static::$routes, true) . ';';
-                    file_put_contents(static::$cacheFile, $code);
+                try {
+                    if (static::$cacheFile) {
+                        $code = '<?php' . PHP_EOL . '// time:' . date('Y-m-d H:i:s') . PHP_EOL .
+                            'return ' . var_export(static::$routes, true) . ';';
+                        file_put_contents(static::$cacheFile, $code);
+                    }
+                } catch (\Throwable $e) {
+                    // 为了不影响后面的register_shutdown_function 要捕获所有的异常
                 }
             });
             return false;
