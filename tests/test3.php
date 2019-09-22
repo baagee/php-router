@@ -9,6 +9,7 @@ $routes = [
         function ($params) {// 具体的回调方法
             echo 'get';
             var_dump($params);
+            return time();
         },
         //  其他附加信息
         ['other', 'info']
@@ -19,6 +20,7 @@ $routes = [
         function ($params) {
             echo 'post';
             var_dump($params);
+            return time();
         }, ['other', 'info']
     ],
 
@@ -26,15 +28,16 @@ $routes = [
         ['post', 'get'],
         function () {
             echo 'post get';
+            return time();
         }
     ],
     '/getput'  => [
         'get|put',
         function () {
-            echo 'put get';
+            return 'put get';
         }
     ],
 ];
 // 批量添加路由
 \BaAGee\Router\Router::batchAdd($routes);
-\BaAGee\Router\Router::dispatch();
+echo \BaAGee\Router\Router::dispatch();

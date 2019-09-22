@@ -203,7 +203,7 @@ abstract class RouterAbstract implements RouterInterface
     }
 
     /**
-     * 路由分配
+     * @return mixed
      */
     final public static function dispatch()
     {
@@ -212,11 +212,11 @@ abstract class RouterAbstract implements RouterInterface
         if (array_key_exists($requestPath, static::$routes['static'])) {
             $routerDetail = static::$routes['static'][$requestPath];
             if (in_array($requestMethod, $routerDetail[0])) {
-                static::call($routerDetail[1], [], $requestMethod, $routerDetail[2]);
+                $response = static::call($routerDetail[1], [], $requestMethod, $routerDetail[2]);
             } else {
-                static::responseMethodNotAllow();// 405
+                $response = static::responseMethodNotAllow();// 405
             }
-            return;
+            return $response;
         } else {
             // 正则
             $dd = $requestPath{1};
@@ -235,17 +235,16 @@ abstract class RouterAbstract implements RouterInterface
                                 unset($matched[$k]);
                             }
                         }
-                        static::call($routerDetail[1], $matched, $requestMethod, $routerDetail[2]);
+                        $response = static::call($routerDetail[1], $matched, $requestMethod, $routerDetail[2]);
                     } else {
-                        static::responseMethodNotAllow();// 405
+                        $response = static::responseMethodNotAllow();// 405
                     }
-                    return;
+                    return $response;
                 }
             }
         }
         // 404
-        static::responseNotFound();
-        return;
+        return static::responseNotFound();
     }
 
     /**
@@ -257,9 +256,10 @@ abstract class RouterAbstract implements RouterInterface
             static::$routes = [];
             static::get($_SERVER['PATH_INFO'], static::$notFound);
             static::$notFound = null;
-            static::dispatch();
+            return static::dispatch();
         } else {
             http_response_code(404);
+            return '';
         }
     }
 
@@ -272,9 +272,10 @@ abstract class RouterAbstract implements RouterInterface
             static::$routes = [];
             static::get($_SERVER['PATH_INFO'], static::$methodNotAllow);
             static::$methodNotAllow = null;
-            static::dispatch();
+            return static::dispatch();
         } else {
             http_response_code(405);
+            return '';
         }
     }
 
