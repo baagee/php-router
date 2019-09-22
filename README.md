@@ -76,7 +76,7 @@ include_once __DIR__ . '/../vendor/autoload.php';
     echo 'get/post';
 });
 // 开始匹配路由并调用对应的回调方法
-\BaAGee\Router\Router::dispatch();
+echo \BaAGee\Router\Router::dispatch();
 ```
 ### 批量添加路由
 ```php
@@ -116,7 +116,7 @@ $routes = [
 ];
 // 批量添加路由
 \BaAGee\Router\Router::batchAdd($routes);
-\BaAGee\Router\Router::dispatch();
+echo \BaAGee\Router\Router::dispatch();
 ```
 
 ### 自定义调用方式
@@ -157,7 +157,7 @@ MyRouter::get('/get[/{id}]', 'UserController->action', [
     ]
 ]);
 
-MyRouter::dispatch();
+echo MyRouter::dispatch();
 ```
 
 ### 路由缓存
@@ -201,7 +201,7 @@ if ($isDebug || \BaAGee\Router\Router::setCachePath(__DIR__ . '/cache') === fals
     addRouter();
 }
 
-\BaAGee\Router\Router::dispatch();
+echo \BaAGee\Router\Router::dispatch();
 ```
 
 ### 注意
