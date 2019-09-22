@@ -50,4 +50,4 @@ if ($isDebug || \BaAGee\Router\Router::setCachePath(__DIR__ . '/cache') === fals
     addRouter();
 }
 
-\BaAGee\Router\Router::dispatch();
+echo \BaAGee\Router\Router::dispatch();

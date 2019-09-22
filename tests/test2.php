@@ -11,7 +11,7 @@ class MyRouter extends \BaAGee\Router\Base\RouterAbstract
      * @param array           $params   请求路由中的参数
      * @param string          $method   请求方法
      * @param array           $other    其他路由辅助信息
-     * @throws \Exception
+     * @return mixed
      */
     protected static function call($callback, $params, $method, $other)
     {
@@ -23,7 +23,7 @@ class MyRouter extends \BaAGee\Router\Base\RouterAbstract
         // todo 调用 中间件
         var_dump($other['middleware']);
         // 调用Action
-        call_user_func_array([$obj, $action], $params);
+        return call_user_func_array([$obj, $action], $params);
     }
 }
 
