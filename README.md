@@ -6,7 +6,7 @@ php router library
 
 ### 使用
 
-支持常见的6中请求方法
+支持8种请求方法
 
 1. GET
 2. POST
@@ -14,6 +14,8 @@ php router library
 4. DELETE
 5. OPTIONS
 6. HEAD
+7. PATCH
+8. TRACE
 
 示例代码：
 ```php
