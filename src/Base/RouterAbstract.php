@@ -16,6 +16,8 @@ namespace BaAGee\Router\Base;
  * @method static delete(string $route, Callable $callback, array $other = [])
  * @method static options(string $route, Callable $callback, array $other = [])
  * @method static head(string $route, Callable $callback, array $other = [])
+ * @method static patch(string $route, Callable $callback, array $other = [])
+ * @method static trace(string $route, Callable $callback, array $other = [])
  * @package BaAGee\Router\Base
  */
 abstract class RouterAbstract implements RouterInterface
@@ -23,7 +25,7 @@ abstract class RouterAbstract implements RouterInterface
     /**
      * @var array http允许的请求方式
      */
-    protected const ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'];
+    protected const ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH', 'TRACE'];
 
     /**
      * 路由回调允许的类型
