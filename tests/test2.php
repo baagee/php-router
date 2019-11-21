@@ -37,4 +37,4 @@ MyRouter::get('/get[/{id}]', 'UserController->action', [
     ]
 ]);
 
-MyRouter::dispatch();
+MyRouter::dispatch($_SERVER['PATH_INFO'], $_SERVER['REQUEST_METHOD']);

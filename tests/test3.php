@@ -40,4 +40,12 @@ $routes = [
 ];
 // 批量添加路由
 \BaAGee\Router\Router::batchAdd($routes);
-echo \BaAGee\Router\Router::dispatch();
+
+\BaAGee\Router\Router::setNotFound(function () {
+    echo 'setNotFound';
+});
+
+\BaAGee\Router\Router::setMethodNotAllow(function () {
+    echo 'setMethodNotAllow';
+});
+echo \BaAGee\Router\Router::dispatch($_SERVER['PATH_INFO'], $_SERVER['REQUEST_METHOD']);

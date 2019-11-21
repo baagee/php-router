@@ -60,4 +60,4 @@ include_once __DIR__ . '/../vendor/autoload.php';
     echo 'get/post';
 });
 // 开始匹配路由并调用对应的回调方法
-echo \BaAGee\Router\Router::dispatch();
+echo \BaAGee\Router\Router::dispatch($_SERVER['PATH_INFO'], $_SERVER['REQUEST_METHOD']);

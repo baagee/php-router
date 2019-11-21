@@ -12,7 +12,7 @@ interface RouterInterface
 {
     public static function add($methods, string $path, $callback, $other = []);
 
-    public static function dispatch();
+    public static function dispatch(string $pathInfo, string $requestMethod);
 
     public static function setNotFound($callback);
 

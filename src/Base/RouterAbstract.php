@@ -205,18 +205,20 @@ abstract class RouterAbstract implements RouterInterface
     }
 
     /**
-     * @return mixed
+     * 路由匹配执行
+     * @param string $pathInfo
+     * @param string $requestMethod
+     * @return string
      */
-    final public static function dispatch()
+    final public static function dispatch(string $pathInfo, string $requestMethod)
     {
-        $requestPath   = empty($_SERVER['PATH_INFO']) ? '/' : $_SERVER['PATH_INFO'];
-        $requestMethod = $_SERVER['REQUEST_METHOD'];
+        $requestPath = empty($pathInfo) ? '/' : $pathInfo;
         if (array_key_exists($requestPath, static::$routes['static'])) {
             $routerDetail = static::$routes['static'][$requestPath];
             if (in_array($requestMethod, $routerDetail[0])) {
                 $response = static::call($routerDetail[1], [], $requestMethod, $routerDetail[2]);
             } else {
-                $response = static::responseMethodNotAllow();// 405
+                $response = static::responseMethodNotAllow($pathInfo, $requestMethod);// 405
             }
             return $response;
         } else {
@@ -239,26 +241,29 @@ abstract class RouterAbstract implements RouterInterface
                         }
                         $response = static::call($routerDetail[1], $matched, $requestMethod, $routerDetail[2]);
                     } else {
-                        $response = static::responseMethodNotAllow();// 405
+                        $response = static::responseMethodNotAllow($pathInfo, $requestMethod);// 405
                     }
                     return $response;
                 }
             }
         }
         // 404
-        return static::responseNotFound();
+        return static::responseNotFound($pathInfo, $requestMethod);
     }
 
     /**
      * 响应404
+     * @param $pathInfo
+     * @param $requestMethod
+     * @return string
      */
-    final protected static function responseNotFound()
+    final protected static function responseNotFound($pathInfo, $requestMethod)
     {
         if (static::$notFound !== null) {
             static::$routes = [];
-            static::get($_SERVER['PATH_INFO'], static::$notFound);
+            static::get($pathInfo, static::$notFound);
             static::$notFound = null;
-            return static::dispatch();
+            return static::dispatch($pathInfo, $requestMethod);
         } else {
             http_response_code(404);
             return '';
@@ -267,14 +272,17 @@ abstract class RouterAbstract implements RouterInterface
 
     /**
      * 响应405
+     * @param $pathInfo
+     * @param $requestMethod
+     * @return string
      */
-    final protected static function responseMethodNotAllow()
+    final protected static function responseMethodNotAllow($pathInfo, $requestMethod)
     {
         if (static::$methodNotAllow !== null) {
             static::$routes = [];
-            static::get($_SERVER['PATH_INFO'], static::$methodNotAllow);
+            static::get($pathInfo, static::$methodNotAllow);
             static::$methodNotAllow = null;
-            return static::dispatch();
+            return static::dispatch($pathInfo, $requestMethod);
         } else {
             http_response_code(405);
             return '';
