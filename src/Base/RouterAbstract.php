@@ -73,7 +73,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function setCachePath($path)
     {
-        if ($path{0} !== DIRECTORY_SEPARATOR) {
+        if ($path[0] !== DIRECTORY_SEPARATOR) {
             $path = realpath($path);
         }
         if (!is_dir($path) || !is_writeable($path)) {
@@ -159,7 +159,7 @@ abstract class RouterAbstract implements RouterInterface
             static::$routes['static'][$res['path']] = $arr;
         } else {
             // 正则表达式
-            $char = $res['path']{2};
+            $char = $res['path'][2];
             $dd   = preg_match('/[a-zA-Z]/', $char);
             if ($dd === false || $dd === 0) {
                 // 没有匹配到
@@ -223,7 +223,7 @@ abstract class RouterAbstract implements RouterInterface
             return $response;
         } else {
             // 正则
-            $dd = $requestPath{1};
+            $dd = $requestPath[1];
             if (isset(static::$routes['regexp'][$dd])) {
                 $foreach = array_merge(static::$routes['regexp'][$dd], static::$routes['regexp']['/'] ?? []);
             } else {
