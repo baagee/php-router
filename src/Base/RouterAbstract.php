@@ -213,7 +213,7 @@ abstract class RouterAbstract implements RouterInterface
     final public static function dispatch(string $pathInfo, string $requestMethod)
     {
         $requestPath = empty($pathInfo) ? '/' : $pathInfo;
-        if (array_key_exists($requestPath, static::$routes['static'])) {
+        if (isset(static::$routes['static'][$requestPath])) {
             $routerDetail = static::$routes['static'][$requestPath];
             if (in_array($requestMethod, $routerDetail[0])) {
                 $response = static::call($routerDetail[1], [], $requestMethod, $routerDetail[2]);
