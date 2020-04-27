@@ -128,14 +128,14 @@ abstract class RouterAbstract implements RouterInterface
         $res2 = strpos($path, '{') !== false && strpos($path, '}') !== false;
         if ($res1 || $res2) {
             // 路由规则使用了正则表达式，转化为标准正则
-            $path     = preg_replace('`\{(\S+?)\}`', '(?<$1>\S+?)', str_replace(['[', ']', '/'], ['(?:', ')?', '\/'], $path));
+            $path = preg_replace('`\{(\S+?)\}`', '(?<$1>\S+?)', str_replace(['[', ']', '/'], ['(?:', ')?', '\/'], $path));
             $isStatic = false;
         } else {
             // 没有正则表达式
             $isStatic = true;
         }
         $methods = array_map('strtoupper', is_array($methods) ? $methods : explode('|', $methods));
-        $diff    = array_diff($methods, static::ALLOW_METHODS);
+        $diff = array_diff($methods, static::ALLOW_METHODS);
         if (!empty($diff)) {
             throw new \Exception(sprintf('[%s]存在不合法的请求方法[%s]', $path, implode(', ', $diff)));
         }
@@ -160,12 +160,14 @@ abstract class RouterAbstract implements RouterInterface
         } else {
             // 正则表达式
             $char = $res['path'][2];
-            $dd   = preg_match('/[a-zA-Z]/', $char);
+            $dd = preg_match('/[a-zA-Z]/', $char);
             if ($dd === false || $dd === 0) {
                 // 没有匹配到
                 $char = '/';
             }
-            static::$routes['regexp'][$char][$res['path']] = $arr;
+            foreach ($res['methods'] as $method) {
+                static::$routes['regexp'][$method][$char][$res['path']] = $arr;
+            }
         }
     }
 
@@ -212,6 +214,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function dispatch(string $pathInfo, string $requestMethod)
     {
+        $requestMethod = strtoupper($requestMethod);
         $requestPath = empty($pathInfo) ? '/' : $pathInfo;
         if (isset(static::$routes['static'][$requestPath])) {
             $routerDetail = static::$routes['static'][$requestPath];
@@ -224,26 +227,29 @@ abstract class RouterAbstract implements RouterInterface
         } else {
             // 正则
             $dd = $requestPath[1];
-            if (isset(static::$routes['regexp'][$dd])) {
-                $foreach = array_merge(static::$routes['regexp'][$dd], static::$routes['regexp']['/'] ?? []);
+            if (isset(static::$routes['regexp'][$requestMethod][$dd])) {
+                $foreach = array_merge(static::$routes['regexp'][$requestMethod][$dd],
+                    static::$routes['regexp'][$requestMethod]['/'] ?? []);
             } else {
-                $foreach = static::$routes['regexp']['/'] ?? [];
+                $foreach = static::$routes['regexp'][$requestMethod]['/'] ?? [];
             }
-            foreach ($foreach as $path => $routerDetail) {
-                $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
-                if ($res === 0 || $res === false) {
-                } else {
-                    if (in_array($requestMethod, $routerDetail[0])) {
-                        foreach ($matched as $k => $v) {
-                            if (!is_string($k)) {
-                                unset($matched[$k]);
-                            }
-                        }
-                        $response = static::call($routerDetail[1], $matched, $requestMethod, $routerDetail[2]);
+            if (!empty($foreach)) {
+                foreach ($foreach as $path => $routerDetail) {
+                    $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
+                    if ($res === 0 || $res === false) {
                     } else {
-                        $response = static::responseMethodNotAllow($pathInfo, $requestMethod);// 405
+                        if (in_array($requestMethod, $routerDetail[0])) {
+                            foreach ($matched as $k => $v) {
+                                if (!is_string($k)) {
+                                    unset($matched[$k]);
+                                }
+                            }
+                            $response = static::call($routerDetail[1], $matched, $requestMethod, $routerDetail[2]);
+                        } else {
+                            $response = static::responseMethodNotAllow($pathInfo, $requestMethod);// 405
+                        }
+                        return $response;
                     }
-                    return $response;
                 }
             }
         }
