@@ -32,9 +32,19 @@ class App
 function addRouter()
 {
     \BaAGee\Router\Router::get('/get/test1', 'App@test1');
-    \BaAGee\Router\Router::get('/get/test2', 'App@test2');
-    \BaAGee\Router\Router::get('/get/{name}', 'App@test3');
+    \BaAGee\Router\Router::get('/aget/test2', 'App@test2');
+    \BaAGee\Router\Router::get('/bget/{name}', 'App@test3');
+    \BaAGee\Router\Router::post('/aget/{name}', 'App@test3');
+    \BaAGee\Router\Router::get('/bget/{name}', 'App@test3');
+    \BaAGee\Router\Router::put('/cget/{name}', 'App@test3');
+    \BaAGee\Router\Router::get('/dget/{name}', 'App@test3');
+    \BaAGee\Router\Router::delete('/eget/{name}', 'App@test3');
+    \BaAGee\Router\Router::get('/fget/{name}', 'App@test3');
+    \BaAGee\Router\Router::post('/gget/{name}', 'App@test3');
+    \BaAGee\Router\Router::get('/hget/{name}', 'App@test3');
     \BaAGee\Router\Router::get('/[{aaa}]', 'App@test3');
+    \BaAGee\Router\Router::delete('/{id}', 'App@test3');
+    \BaAGee\Router\Router::add('GET|POST', '/ggpp[/{aaa}]', 'App@test3');
 }
 
 // 是否开发模式

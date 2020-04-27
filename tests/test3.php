@@ -38,6 +38,7 @@ $routes = [
         }
     ],
 ];
+$a=microtime(true);
 // 批量添加路由
 \BaAGee\Router\Router::batchAdd($routes);
 
@@ -48,4 +49,9 @@ $routes = [
 \BaAGee\Router\Router::setMethodNotAllow(function () {
     echo 'setMethodNotAllow';
 });
-echo \BaAGee\Router\Router::dispatch($_SERVER['PATH_INFO'], $_SERVER['REQUEST_METHOD']);
+// echo \BaAGee\Router\Router::dispatch($_SERVER['PATH_INFO'], $_SERVER['REQUEST_METHOD']);
+for ($i = 0; $i <= 1000; $i++) {
+    echo \BaAGee\Router\Router::dispatch('/get/235', 'GET');
+}
+$b=microtime(true);
+var_dump(($b-$a));
