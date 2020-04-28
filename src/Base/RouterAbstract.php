@@ -157,6 +157,9 @@ abstract class RouterAbstract implements RouterInterface
         $res = static::checkRoute($path, $method, $callback);
         $entryId = md5(serialize([$res['callback'], $other]));
         if ($res['isStatic']) {
+            if (isset(static::$routes['static'][$res['path']]) && static::$routes['static'][$res['path']] !== $entryId) {
+                throw new \Exception(sprintf("路由规则[%s]已存在但是对应回调不一致", $path));
+            }
             static::$routes['static'][$res['path']] = $entryId;
         } else {
             // 正则表达式
@@ -167,6 +170,9 @@ abstract class RouterAbstract implements RouterInterface
                 $char = '/';
             }
             foreach ($res['methods'] as $method) {
+                if (isset(static::$routes['regexp'][$method][$char][$res['path']]) && static::$routes['regexp'][$method][$char][$res['path']] !== $entryId) {
+                    throw new \Exception(sprintf("路由规则[%s]已存在但是对应回调不一致", $path));
+                }
                 static::$routes['regexp'][$method][$char][$res['path']] = $entryId;
             }
         }
