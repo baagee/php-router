@@ -35,7 +35,6 @@ function addRouter()
     \BaAGee\Router\Router::get('/aget/test2', 'App@test2');
     \BaAGee\Router\Router::get('/bget/{name}', 'App@test3');
     \BaAGee\Router\Router::post('/aget/{name}', 'App@test3');
-    \BaAGee\Router\Router::get('/bget/{name}', 'App@test3');
     \BaAGee\Router\Router::put('/cget/{name}', 'App@test3');
     \BaAGee\Router\Router::get('/dget/{name}', 'App@test3');
     \BaAGee\Router\Router::delete('/eget/{name}', 'App@test3');
