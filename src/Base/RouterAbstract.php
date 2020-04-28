@@ -41,8 +41,9 @@ abstract class RouterAbstract implements RouterInterface
      * @var array 保存的路由规则
      */
     protected static $routes = [
-        'static' => [],//静态路由
-        'regexp' => []// 正则表达式路由
+        'static' => [],// 静态路由
+        'regexp' => [],// 正则表达式路由
+        'entry' => [],// 回调
     ];
 
     /**
@@ -154,9 +155,9 @@ abstract class RouterAbstract implements RouterInterface
     final public static function add($method, string $path, $callback, $other = [])
     {
         $res = static::checkRoute($path, $method, $callback);
-        $arr = [$res['methods'], $res['callback'], $other];
+        $entryId = md5(serialize([$res['callback'], $other]));
         if ($res['isStatic']) {
-            static::$routes['static'][$res['path']] = $arr;
+            static::$routes['static'][$res['path']] = $entryId;
         } else {
             // 正则表达式
             $char = $res['path'][2];
@@ -166,9 +167,13 @@ abstract class RouterAbstract implements RouterInterface
                 $char = '/';
             }
             foreach ($res['methods'] as $method) {
-                static::$routes['regexp'][$method][$char][$res['path']] = $arr;
+                static::$routes['regexp'][$method][$char][$res['path']] = $entryId;
             }
         }
+        if (isset(static::$routes['entry'][$entryId][0]) && is_array(static::$routes['entry'][$entryId][0])) {
+            $res['methods'] = array_merge($res['methods'], static::$routes['entry'][$entryId][0]);
+        }
+        static::$routes['entry'][$entryId] = [array_values(array_unique($res['methods'])), $res['callback'], $other];
     }
 
     /**
@@ -217,7 +222,7 @@ abstract class RouterAbstract implements RouterInterface
         $requestMethod = strtoupper($requestMethod);
         $requestPath = empty($pathInfo) ? '/' : $pathInfo;
         if (isset(static::$routes['static'][$requestPath])) {
-            $routerDetail = static::$routes['static'][$requestPath];
+            $routerDetail = static::$routes['entry'][static::$routes['static'][$requestPath]] ?? [];
             if (in_array($requestMethod, $routerDetail[0])) {
                 $response = static::call($routerDetail[1], [], $requestMethod, $routerDetail[2]);
             } else {
@@ -234,10 +239,11 @@ abstract class RouterAbstract implements RouterInterface
                 $foreach = static::$routes['regexp'][$requestMethod]['/'] ?? [];
             }
             if (!empty($foreach)) {
-                foreach ($foreach as $path => $routerDetail) {
+                foreach ($foreach as $path => $entryId) {
                     $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
                     if ($res === 0 || $res === false) {
                     } else {
+                        $routerDetail = static::$routes['entry'][$entryId] ?? [];
                         if (in_array($requestMethod, $routerDetail[0])) {
                             foreach ($matched as $k => $v) {
                                 if (!is_string($k)) {

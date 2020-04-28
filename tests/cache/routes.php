@@ -1,9 +1,74 @@
 <?php
-// time:2020-04-27 16:28:16
+// time:2020-04-28 03:12:36
 return array(
     'static' =>
         array(
-            '/get/test1' =>
+            '/get/test1' => '24c0b17da24f7233632d199b98b9cae9',
+            '/aget/test2' => 'b3a5b1ad2711ffa91b3d1f121f99b2af',
+        ),
+    'regexp' =>
+        array(
+            'GET' =>
+                array(
+                    'b' =>
+                        array(
+                            '\\/bget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                    'd' =>
+                        array(
+                            '\\/dget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                    'f' =>
+                        array(
+                            '\\/fget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                    'h' =>
+                        array(
+                            '\\/hget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                    '/' =>
+                        array(
+                            '\\/(?:(?<aaa>\\S+?))?' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                    'g' =>
+                        array(
+                            '\\/ggpp(?:\\/(?<aaa>\\S+?))?' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                ),
+            'POST' =>
+                array(
+                    'a' =>
+                        array(
+                            '\\/aget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                    'g' =>
+                        array(
+                            '\\/gget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                            '\\/ggpp(?:\\/(?<aaa>\\S+?))?' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                ),
+            'PUT' =>
+                array(
+                    'c' =>
+                        array(
+                            '\\/cget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                ),
+            'DELETE' =>
+                array(
+                    'e' =>
+                        array(
+                            '\\/eget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                    '/' =>
+                        array(
+                            '\\/(?<id>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                        ),
+                ),
+        ),
+    'entry' =>
+        array(
+            '24c0b17da24f7233632d199b98b9cae9' =>
                 array(
                     0 =>
                         array(
@@ -13,7 +78,7 @@ return array(
                     2 =>
                         array(),
                 ),
-            '/aget/test2' =>
+            'b3a5b1ad2711ffa91b3d1f121f99b2af' =>
                 array(
                     0 =>
                         array(
@@ -23,175 +88,18 @@ return array(
                     2 =>
                         array(),
                 ),
-        ),
-    'regexp' =>
-        array(
-            'GET' =>
+            '10e9fca8db24f6f027d2412ea3b6b248' =>
                 array(
-                    'b' =>
+                    0 =>
                         array(
-                            '\\/bget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'GET',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
+                            0 => 'GET',
+                            1 => 'POST',
+                            2 => 'DELETE',
+                            3 => 'PUT',
                         ),
-                    'd' =>
-                        array(
-                            '\\/dget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'GET',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                    'f' =>
-                        array(
-                            '\\/fget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'GET',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                    'h' =>
-                        array(
-                            '\\/hget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'GET',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                    '/' =>
-                        array(
-                            '\\/(?:(?<aaa>\\S+?))?' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'GET',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                    'g' =>
-                        array(
-                            '\\/ggpp(?:\\/(?<aaa>\\S+?))?' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'GET',
-                                            1 => 'POST',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                ),
-            'POST' =>
-                array(
-                    'a' =>
-                        array(
-                            '\\/aget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'POST',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                    'g' =>
-                        array(
-                            '\\/gget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'POST',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                            '\\/ggpp(?:\\/(?<aaa>\\S+?))?' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'GET',
-                                            1 => 'POST',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                ),
-            'PUT' =>
-                array(
-                    'c' =>
-                        array(
-                            '\\/cget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'PUT',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                ),
-            'DELETE' =>
-                array(
-                    'e' =>
-                        array(
-                            '\\/eget\\/(?<name>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'DELETE',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
-                    '/' =>
-                        array(
-                            '\\/(?<id>\\S+?)' =>
-                                array(
-                                    0 =>
-                                        array(
-                                            0 => 'DELETE',
-                                        ),
-                                    1 => 'App@test3',
-                                    2 =>
-                                        array(),
-                                ),
-                        ),
+                    1 => 'App@test3',
+                    2 =>
+                        array(),
                 ),
         ),
 );
