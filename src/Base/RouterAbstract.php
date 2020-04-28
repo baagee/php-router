@@ -155,7 +155,12 @@ abstract class RouterAbstract implements RouterInterface
     final public static function add($method, string $path, $callback, $other = [])
     {
         $res = static::checkRoute($path, $method, $callback);
-        $entryId = md5(serialize([$res['callback'], $other]));
+        if ($res['callback'] instanceof \Closure) {
+            // TODO 闭包如何序列化，反序列化
+            $entryId = md5(microtime(true) * 10000 + mt_rand(1000, 9999));
+        } else {
+            $entryId = md5(serialize([$res['callback'], $other]));
+        }
         if ($res['isStatic']) {
             if (isset(static::$routes['static'][$res['path']]) && static::$routes['static'][$res['path']] !== $entryId) {
                 throw new \Exception(sprintf("路由规则[%s]已存在但是对应回调不一致", $path));
@@ -246,9 +251,7 @@ abstract class RouterAbstract implements RouterInterface
             }
             if (!empty($foreach)) {
                 foreach ($foreach as $path => $entryId) {
-                    $res = preg_match('`^' . $path . '$`', $requestPath, $matched);
-                    if ($res === 0 || $res === false) {
-                    } else {
+                    if (($matched = static::isMatched($path, $requestPath)) !== false) {
                         $routerDetail = static::$routes['entry'][$entryId] ?? [];
                         if (in_array($requestMethod, $routerDetail[0])) {
                             foreach ($matched as $k => $v) {
@@ -270,16 +273,32 @@ abstract class RouterAbstract implements RouterInterface
             $dd = $requestPath[1];
             if (isset($routes[$dd]) && !empty($routes[$dd])) {
                 foreach ($routes[$dd] as $route => $entryId) {
-                    $res = preg_match('`^' . $route . '$`', $requestPath, $matched);
-                    if ($res === 0 || $res === false) {
-                    } else {
-                        return static::responseMethodNotAllow($pathInfo, $requestMethod);
+                    if (static::isMatched($route, $requestPath) !== false) {
+                        if ($method != $requestMethod) {
+                            return static::responseMethodNotAllow($pathInfo, $requestMethod);
+                        }
                     }
                 }
             }
         }
         // response 404
         return static::responseNotFound($pathInfo, $requestMethod);
+    }
+
+    /**
+     * 是否匹配
+     * @param string $route       路由规则
+     * @param string $requestPath 请求路径
+     * @return bool|array 失败返回false 成功返回匹配到的信息
+     */
+    final protected static function isMatched($route, $requestPath)
+    {
+        $res = preg_match('`^' . $route . '$`', $requestPath, $matched);
+        if ($res === 0 || $res === false) {
+            return false;
+        } else {
+            return $matched;
+        }
     }
 
     /**

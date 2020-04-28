@@ -43,7 +43,9 @@ function addRouter()
     \BaAGee\Router\Router::post('/gget/{name}', 'App@test3');
     \BaAGee\Router\Router::get('/hget/{name}', 'App@test3');
     \BaAGee\Router\Router::get('/[{aaa}]', 'App@test3');
-    \BaAGee\Router\Router::delete('/{id}', 'App@test3');
+    \BaAGee\Router\Router::delete('/{id}', function () {
+
+    });
     \BaAGee\Router\Router::add('GET|POST', '/ggpp[/{aaa}]', 'App@test3');
 }
 
