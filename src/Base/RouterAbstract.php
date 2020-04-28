@@ -265,7 +265,20 @@ abstract class RouterAbstract implements RouterInterface
                 }
             }
         }
-        // 404
+        // response method not allow
+        foreach (static::$routes['regexp'] as $method => $routes) {
+            $dd = $requestPath[1];
+            if (isset($routes[$dd]) && !empty($routes[$dd])) {
+                foreach ($routes[$dd] as $route => $entryId) {
+                    $res = preg_match('`^' . $route . '$`', $requestPath, $matched);
+                    if ($res === 0 || $res === false) {
+                    } else {
+                        return static::responseMethodNotAllow($pathInfo, $requestMethod);
+                    }
+                }
+            }
+        }
+        // response 404
         return static::responseNotFound($pathInfo, $requestMethod);
     }
 

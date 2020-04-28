@@ -13,6 +13,7 @@ return array(
                     'b' =>
                         array(
                             '\\/bget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
+                            '\\/bgetb\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
                         ),
                     'd' =>
                         array(
