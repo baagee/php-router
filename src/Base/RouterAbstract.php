@@ -184,7 +184,7 @@ abstract class RouterAbstract implements RouterInterface
         } else {
             // 正则表达式
             $char = $res['path'][2];
-            $dd = preg_match('/[a-zA-Z]/', $char);
+            $dd = preg_match('/[a-zA-Z0-9]/', $char);
             if ($dd === false || $dd === 0) {
                 // 没有匹配到
                 $char = '/';

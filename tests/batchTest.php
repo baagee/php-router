@@ -139,7 +139,7 @@ $isDebug = false;
 //      请求结束时将路由信息写入缓存文件，下次执行时文件存在，返回true，
 //      跳过添加路由，直接执行dispatch
 // 如果是开发模式(true)，每次都走添加路由的方法，然后执行dispatch
-if ($isDebug || \BaAGee\Router\Router::setCachePath(__DIR__ . '/cache') === false) {
+if ($isDebug || \BaAGee\Router\Router::setCachePath(__DIR__ . '/cache/batch') === false) {
     echo '没有缓存' . PHP_EOL;
     batchAddRouter($list);
 }
