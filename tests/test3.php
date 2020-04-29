@@ -4,41 +4,46 @@ include_once __DIR__ . '/../vendor/autoload.php';
 
 // 定义路由规则
 $routes = [
-    '/get/{id}' => [
-        'get',// 允许的请求方法
-        function ($params) {// 具体的回调方法
+    [
+        'path' => '/get/{id}',
+        'method' => 'get',// 允许的请求方法
+        'callback' => function ($params) {// 具体的回调方法
             echo 'get';
             var_dump($params);
             return time();
         },
         //  其他附加信息
-        ['other', 'info']
+        'other' => ['other', 'info']
     ],
 
-    '/post[/{name}][/{id}]' => [
-        ['post'],
-        function ($params) {
+    [
+        'path' => '/post[/{name}][/{id}]',
+        'method' => ['post'],
+        'callback' => function ($params) {
             echo 'post';
             var_dump($params);
             return time();
-        }, ['other', 'info']
+        },
+        'other' => ['other', 'info']
     ],
 
-    '/getpost' => [
-        ['post', 'get'],
-        function () {
+    [
+        'path' => '/getpost',
+        'method' => ['post', 'get'],
+        'callback' => function () {
             echo 'post get';
             return time();
         }
     ],
-    '/getput'  => [
-        'get|put',
-        function () {
+    [
+        'path' => '/getput',
+        'method' => 'get|put',
+        'callback' => function () {
             return 'put get';
         }
     ],
 ];
-$a=microtime(true);
+$a = microtime(true);
 // 批量添加路由
 \BaAGee\Router\Router::batchAdd($routes);
 
@@ -53,5 +58,5 @@ $a=microtime(true);
 for ($i = 0; $i <= 1000; $i++) {
     echo \BaAGee\Router\Router::dispatch('/get/235', 'GET');
 }
-$b=microtime(true);
-var_dump(($b-$a));
+$b = microtime(true);
+var_dump(($b - $a));

@@ -114,13 +114,13 @@ abstract class RouterAbstract implements RouterInterface
 
     /**
      * 批量添加路由
-     * @param array $routes
+     * @param array $routes ['method'=>'','path'=>'','callback'=>'','other'=>[]]
      * @throws \Exception
      */
     final public static function batchAdd(array $routes)
     {
-        foreach ($routes as $path => $route) {
-            static::add($route[0], $path, $route[1], (isset($route[2]) && !empty($route[2])) ? $route[2] : []);
+        foreach ($routes as $route) {
+            static::add($route['method'] ?? '', $route['path'] ?? '', $route['callback'] ?? '', $route['other'] ?? []);
         }
     }
 
@@ -134,6 +134,9 @@ abstract class RouterAbstract implements RouterInterface
      */
     private static function checkRoute($path, $methods, $callback)
     {
+        if (empty($path) || empty($methods) || empty($callback)) {
+            throw new \Exception("添加路由失败，参数为空");
+        }
         $path = preg_replace('/\/+/', '/', strpos($path, '/') === 0 ? $path : '/' . $path);
         $res1 = strpos($path, '[') !== false && strpos($path, ']') !== false;
         $res2 = strpos($path, '{') !== false && strpos($path, '}') !== false;
@@ -164,7 +167,7 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function add($method, string $path, $callback, $other = [])
     {
-        $res = static::checkRoute($path, $method, $callback);
+        $res = static::checkRoute(trim($path), $method, $callback);
         if ($res['callback'] instanceof \Closure) {
             static::$hasClosure = true;
             $entryId = md5(microtime(true) * 10000 + mt_rand(1000, 9999));

@@ -85,34 +85,42 @@ echo \BaAGee\Router\Router::dispatch($_SERVER['PATH_INFO'], $_SERVER['REQUEST_ME
 include_once __DIR__ . '/../vendor/autoload.php';
 // 定义路由规则
 $routes = [
-    '/get/{id}' => [
-        'get',// 允许的请求方法
-        function ($params) {// 具体的回调方法
+    [
+        'path' => '/get/{id}',
+        'method' => 'get',// 允许的请求方法
+        'callback' => function ($params) {// 具体的回调方法
             echo 'get';
             var_dump($params);
+            return time();
         },
         //  其他附加信息
-        ['other', 'info']
+        'other' => ['other', 'info']
     ],
 
-    '/post[/{name}][/{id}]' => [
-        ['post'],
-        function ($params) {
+    [
+        'path' => '/post[/{name}][/{id}]',
+        'method' => ['post'],
+        'callback' => function ($params) {
             echo 'post';
             var_dump($params);
-        }, ['other', 'info']
+            return time();
+        },
+        'other' => ['other', 'info']
     ],
 
-    '/getpost' => [
-        ['post', 'get'],
-        function () {
+    [
+        'path' => '/getpost',
+        'method' => ['post', 'get'],
+        'callback' => function () {
             echo 'post get';
+            return time();
         }
     ],
-    '/getput'  => [
-        'get|put',
-        function () {
-            echo 'put get';
+    [
+        'path' => '/getput',
+        'method' => 'get|put',
+        'callback' => function () {
+            return 'put get';
         }
     ],
 ];
