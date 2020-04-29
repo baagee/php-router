@@ -49,7 +49,9 @@ for ($i = 0; $i <= 4000; $i++) {
                     ), $m, 'ok']
     ];
 }
-unlink(__DIR__ . '/cache/ben/routes.php');
+if (is_file(__DIR__ . '/cache/ben/routes.php')) {
+    unlink(__DIR__ . '/cache/ben/routes.php');
+}
 if (\BaAGee\Router\Router::setCachePath(__DIR__ . '/cache/ben') === false) {
     echo '没有缓存' . PHP_EOL;
     batchAddRouter($list);
@@ -81,11 +83,11 @@ echo (($e - $s) * 1000 / $i) . 'ms' . PHP_EOL;
 // 匹配并验证
 function check($path, $method, $callback, $expect)
 {
-    \BaAGee\Router\Router::dispatch($path, $method);
+    $resp = \BaAGee\Router\Router::dispatch($path, $method);
 }
-// 10000 0.23
-// 4000 0.097
-// 3000 0.081
-// 2000 0.071
-// 1000 0.061
-// 100 0.055
+// 10000 1.5 0.23  ms
+// 4000 0.39 0.097 ms
+// 3000 0.29 0.081 ms
+// 2000 0.21 0.071 ms
+// 1000 0.133 0.093 ms
+// 100 0.060 0.055 ms
