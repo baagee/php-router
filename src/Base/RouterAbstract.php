@@ -57,6 +57,11 @@ abstract class RouterAbstract implements RouterInterface
     protected static $methodNotAllow = null;
 
     /**
+     * @var bool 路由回调是否含有匿名函数
+     */
+    protected static $hasClosure = false;
+
+    /**
      * @param $name
      * @param $arguments
      * @throws \Exception
@@ -89,10 +94,15 @@ abstract class RouterAbstract implements RouterInterface
         } else {
             register_shutdown_function(function () {
                 try {
-                    if (static::$cacheFile) {
+                    if (!empty(static::$cacheFile) && static::$hasClosure == false) {
+                        //只缓存路由中没有匿名函数的，因为匿名函数不太好序列化储存
                         $code = '<?php' . PHP_EOL . '// time:' . date('Y-m-d H:i:s') . PHP_EOL .
                             'return ' . var_export(static::$routes, true) . ';';
                         file_put_contents(static::$cacheFile, $code);
+                    } else {
+                        if (is_file(static::$cacheFile)) {
+                            unlink(static::$cacheFile);
+                        }
                     }
                 } catch (\Throwable $e) {
                     // 为了不影响后面的register_shutdown_function 要捕获所有的异常
@@ -156,16 +166,18 @@ abstract class RouterAbstract implements RouterInterface
     {
         $res = static::checkRoute($path, $method, $callback);
         if ($res['callback'] instanceof \Closure) {
-            // TODO 闭包如何序列化，反序列化
+            static::$hasClosure = true;
             $entryId = md5(microtime(true) * 10000 + mt_rand(1000, 9999));
         } else {
             $entryId = md5(serialize([$res['callback'], $other]));
         }
         if ($res['isStatic']) {
-            if (isset(static::$routes['static'][$res['path']]) && static::$routes['static'][$res['path']] !== $entryId) {
-                throw new \Exception(sprintf("路由规则[%s]已存在但是对应回调不一致", $path));
+            foreach ($res['methods'] as $method) {
+                if (isset(static::$routes['static'][$method][$res['path']]) && static::$routes['static'][$method][$res['path']] !== $entryId) {
+                    throw new \Exception(sprintf("路由规则[%s]已存在但是对应回调不一致", $path));
+                }
+                static::$routes['static'][$method][$res['path']] = $entryId;
             }
-            static::$routes['static'][$res['path']] = $entryId;
         } else {
             // 正则表达式
             $char = $res['path'][2];
@@ -196,7 +208,8 @@ abstract class RouterAbstract implements RouterInterface
     {
         $cType = gettype($callback);
         if (!in_array($cType, static::ALLOW_CALLBACK_TYPE)) {
-            throw new \Exception(sprintf('路由回调方法不合法，不允许[%s]类型，只允许[%s]类型', $cType, implode(', ', static::ALLOW_CALLBACK_TYPE)));
+            throw new \Exception(sprintf('路由回调方法不合法，不允许[%s]类型，只允许[%s]类型', $cType,
+                implode(', ', static::ALLOW_CALLBACK_TYPE)));
         }
     }
 
@@ -232,8 +245,8 @@ abstract class RouterAbstract implements RouterInterface
     {
         $requestMethod = strtoupper($requestMethod);
         $requestPath = empty($pathInfo) ? '/' : $pathInfo;
-        if (isset(static::$routes['static'][$requestPath])) {
-            $routerDetail = static::$routes['entry'][static::$routes['static'][$requestPath]] ?? [];
+        if (isset(static::$routes['static'][$requestMethod][$requestPath])) {
+            $routerDetail = static::$routes['entry'][static::$routes['static'][$requestMethod][$requestPath]] ?? [];
             if (in_array($requestMethod, $routerDetail[0])) {
                 $response = static::call($routerDetail[1], [], $requestMethod, $routerDetail[2]);
             } else {
@@ -315,8 +328,13 @@ abstract class RouterAbstract implements RouterInterface
             static::$notFound = null;
             return static::dispatch($pathInfo, $requestMethod);
         } else {
-            http_response_code(404);
-            return '';
+            $ret = '';
+            if (defined('TEST_FDSERFWERTER') && TEST_FDSERFWERTER === true) {
+                $ret = '404';
+            } else {
+                http_response_code(404);
+            }
+            return $ret;
         }
     }
 
@@ -334,8 +352,13 @@ abstract class RouterAbstract implements RouterInterface
             static::$methodNotAllow = null;
             return static::dispatch($pathInfo, $requestMethod);
         } else {
-            http_response_code(405);
-            return '';
+            $ret = '';
+            if (defined('TEST_FDSERFWERTER') && TEST_FDSERFWERTER === true) {
+                $ret = '405';
+            } else {
+                http_response_code(405);
+            }
+            return $ret;
         }
     }
 

@@ -1,106 +1,163 @@
 <?php
-// time:2020-04-28 03:42:41
-return array(
-    'static' =>
-        array(
-            '/get/test1' => '24c0b17da24f7233632d199b98b9cae9',
-            '/aget/test2' => 'b3a5b1ad2711ffa91b3d1f121f99b2af',
-        ),
-    'regexp' =>
-        array(
-            'GET' =>
-                array(
-                    'b' =>
-                        array(
-                            '\\/bget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                            '\\/bgetb\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                    'd' =>
-                        array(
-                            '\\/dget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                    'f' =>
-                        array(
-                            '\\/fget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                    'h' =>
-                        array(
-                            '\\/hget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                    '/' =>
-                        array(
-                            '\\/(?:(?<aaa>\\S+?))?' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                    'g' =>
-                        array(
-                            '\\/ggpp(?:\\/(?<aaa>\\S+?))?' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                ),
-            'POST' =>
-                array(
-                    'a' =>
-                        array(
-                            '\\/aget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                    'g' =>
-                        array(
-                            '\\/gget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                            '\\/ggpp(?:\\/(?<aaa>\\S+?))?' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                ),
-            'PUT' =>
-                array(
-                    'c' =>
-                        array(
-                            '\\/cget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                ),
-            'DELETE' =>
-                array(
-                    'e' =>
-                        array(
-                            '\\/eget\\/(?<name>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                    '/' =>
-                        array(
-                            '\\/(?<id>\\S+?)' => '10e9fca8db24f6f027d2412ea3b6b248',
-                        ),
-                ),
-        ),
-    'entry' =>
-        array(
-            '24c0b17da24f7233632d199b98b9cae9' =>
-                array(
-                    0 =>
-                        array(
-                            0 => 'GET',
-                        ),
-                    1 => 'App@test1',
-                    2 =>
-                        array(),
-                ),
-            'b3a5b1ad2711ffa91b3d1f121f99b2af' =>
-                array(
-                    0 =>
-                        array(
-                            0 => 'GET',
-                        ),
-                    1 => 'App@test2',
-                    2 =>
-                        array(),
-                ),
-            '10e9fca8db24f6f027d2412ea3b6b248' =>
-                array(
-                    0 =>
-                        array(
-                            0 => 'GET',
-                            1 => 'POST',
-                            2 => 'DELETE',
-                            3 => 'PUT',
-                        ),
-                    1 => 'App@test3',
-                    2 =>
-                        array(),
-                ),
-        ),
+// time:2020-04-29 04:54:34
+return array (
+  'static' => 
+  array (
+    'GET' => 
+    array (
+      '/articles' => '55f3c00d15b023045fba87fa1f95898d',
+      '/article/list' => '55f3c00d15b023045fba87fa1f95898d',
+      '/' => '55f3c00d15b023045fba87fa1f95898d',
+      '/car' => 'e489eccc92bb28cc93b4288d93188ee2',
+    ),
+    'POST' => 
+    array (
+      '/article' => '3ff398bc17f1e10091bed0ea9c6703d8',
+      '/car' => '58c7fc11e5ece9bd18a59e3d203905cc',
+    ),
+    'PUT' => 
+    array (
+      '/article' => '8d44bbe066fd97930ca58e194c405bc5',
+      '/car' => '6d27977273248db8f4be3ba9cc56df2f',
+    ),
+  ),
+  'regexp' => 
+  array (
+    'GET' => 
+    array (
+      'a' => 
+      array (
+        '\\/article\\/(?<article_id>\\S+?)' => 'b4f5685e3f278fc7568e8e49c25495ea',
+      ),
+      'c' => 
+      array (
+        '\\/car\\/(?<car_id>\\S+?)' => '4ff287cd2d7ccbc7c711d5c14d4cb276',
+        '\\/car_info\\/(?<car_id>\\S+?)' => '4ff287cd2d7ccbc7c711d5c14d4cb276',
+      ),
+    ),
+    'DELETE' => 
+    array (
+      'a' => 
+      array (
+        '\\/article\\/(?<article_id>\\S+?)' => 'dd04cec6145db49ba49299f4b4f56bf2',
+      ),
+      'c' => 
+      array (
+        '\\/car\\/(?<car_id>\\S+?)' => 'aff05646b57a90ad14cac01917d5c23d',
+      ),
+    ),
+  ),
+  'entry' => 
+  array (
+    '55f3c00d15b023045fba87fa1f95898d' => 
+    array (
+      0 => 
+      array (
+        0 => 'GET',
+      ),
+      1 => 'Article@list',
+      2 => 
+      array (
+      ),
+    ),
+    'b4f5685e3f278fc7568e8e49c25495ea' => 
+    array (
+      0 => 
+      array (
+        0 => 'GET',
+      ),
+      1 => 'Article@detail',
+      2 => 
+      array (
+      ),
+    ),
+    '3ff398bc17f1e10091bed0ea9c6703d8' => 
+    array (
+      0 => 
+      array (
+        0 => 'POST',
+      ),
+      1 => 'Article@add',
+      2 => 
+      array (
+      ),
+    ),
+    '8d44bbe066fd97930ca58e194c405bc5' => 
+    array (
+      0 => 
+      array (
+        0 => 'PUT',
+      ),
+      1 => 'Article@update',
+      2 => 
+      array (
+      ),
+    ),
+    'dd04cec6145db49ba49299f4b4f56bf2' => 
+    array (
+      0 => 
+      array (
+        0 => 'DELETE',
+      ),
+      1 => 'Article@delete',
+      2 => 
+      array (
+      ),
+    ),
+    'e489eccc92bb28cc93b4288d93188ee2' => 
+    array (
+      0 => 
+      array (
+        0 => 'GET',
+      ),
+      1 => 'Car@list',
+      2 => 
+      array (
+      ),
+    ),
+    '4ff287cd2d7ccbc7c711d5c14d4cb276' => 
+    array (
+      0 => 
+      array (
+        0 => 'GET',
+      ),
+      1 => 'Car@detail',
+      2 => 
+      array (
+      ),
+    ),
+    '58c7fc11e5ece9bd18a59e3d203905cc' => 
+    array (
+      0 => 
+      array (
+        0 => 'POST',
+      ),
+      1 => 'Car@add',
+      2 => 
+      array (
+      ),
+    ),
+    '6d27977273248db8f4be3ba9cc56df2f' => 
+    array (
+      0 => 
+      array (
+        0 => 'PUT',
+      ),
+      1 => 'Car@update',
+      2 => 
+      array (
+      ),
+    ),
+    'aff05646b57a90ad14cac01917d5c23d' => 
+    array (
+      0 => 
+      array (
+        0 => 'DELETE',
+      ),
+      1 => 'Car@delete',
+      2 => 
+      array (
+      ),
+    ),
+  ),
 );
