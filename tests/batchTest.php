@@ -51,6 +51,12 @@ $list = [
         'check' => ['/articles', 'get', 'ok']
     ],
     [
+        'route' => '/articles',
+        'callback' => sprintf("%s@%s", Article::class, 'list'),
+        'method' => 'post|PUT',
+        'check' => ['/articles', 'post', 'ok']
+    ],
+    [
         'route' => '/article/list',
         'callback' => sprintf("%s@%s", Article::class, 'list'),
         'method' => 'get',

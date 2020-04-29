@@ -1,5 +1,5 @@
 <?php
-// time:2020-04-29 04:54:34
+// time:2020-04-29 05:00:27
 return array (
   'static' => 
   array (
@@ -12,11 +12,13 @@ return array (
     ),
     'POST' => 
     array (
+      '/articles' => '55f3c00d15b023045fba87fa1f95898d',
       '/article' => '3ff398bc17f1e10091bed0ea9c6703d8',
       '/car' => '58c7fc11e5ece9bd18a59e3d203905cc',
     ),
     'PUT' => 
     array (
+      '/articles' => '55f3c00d15b023045fba87fa1f95898d',
       '/article' => '8d44bbe066fd97930ca58e194c405bc5',
       '/car' => '6d27977273248db8f4be3ba9cc56df2f',
     ),
@@ -54,6 +56,8 @@ return array (
       0 => 
       array (
         0 => 'GET',
+        1 => 'POST',
+        2 => 'PUT',
       ),
       1 => 'Article@list',
       2 => 
