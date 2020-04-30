@@ -92,6 +92,18 @@ $list = [
         'method' => 'get',
         'check' => ['/', 'get', 'ok']
     ],
+    [
+        'route' => '/[{id}]',
+        'callback' => sprintf("%s@%s", Article::class, 'list'),
+        'method' => 'get',
+        'check' => [['/', 'get', 'ok'],['/fsdfs', 'get', 'ok']]
+    ],
+    [
+        'route' => '/{id}',
+        'callback' => sprintf("%s@%s", Article::class, 'list'),
+        'method' => 'get',
+        'check' => [['/', 'get', 'ok'],['/4444555', 'get', 'ok']]
+    ],
     // Car
     [
         'route' => '/car',
