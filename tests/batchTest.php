@@ -165,7 +165,7 @@ foreach ($list as $item) {
 // 匹配并验证
 function check($path, $method, $callback, $expect)
 {
-    echo sprintf("method:%s\t path:%s\t callback:%s" . PHP_EOL, $path, $method, $callback);
+    echo sprintf("method:%s\t path:%s\t callback:%s" . PHP_EOL,$method, $path,  $callback);
     $ret = \BaAGee\Router\Router::dispatch($path, $method);
     if ($ret === $expect) {
         echo "Check [SUCCESS] 👌 Response " . $ret . PHP_EOL;

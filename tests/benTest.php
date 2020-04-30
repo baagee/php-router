@@ -30,7 +30,7 @@ $list = [];
 $ms = [
     'get', 'post', 'put', 'delete'
 ];
-for ($i = 0; $i <= 4000; $i++) {
+for ($i = 0; $i <= 10000; $i++) {
     $u = randomStr(mt_rand(5, 15));
     $m = $ms[mt_rand(0, 3)];
     $list[] = [
@@ -85,9 +85,9 @@ function check($path, $method, $callback, $expect)
 {
     $resp = \BaAGee\Router\Router::dispatch($path, $method);
 }
-// 10000 1.5 0.23  ms
-// 4000 0.39 0.097 ms
-// 3000 0.29 0.081 ms
-// 2000 0.21 0.071 ms
-// 1000 0.133 0.093 ms
-// 100 0.060 0.055 ms
+// 10000 1.5 0.23 0.067 ms
+// 4000 0.39 0.097 0.062 ms
+// 3000 0.29 0.081 0.056 ms
+// 2000 0.21 0.071 0.056 ms
+// 1000 0.133 0.093 0.055 ms
+// 100 0.060 0.055 0.055 ms

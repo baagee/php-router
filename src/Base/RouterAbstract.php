@@ -132,7 +132,7 @@ abstract class RouterAbstract implements RouterInterface
      * @return array
      * @throws \Exception
      */
-    private static function checkRoute($path, $methods, $callback)
+    final private static function checkRoute($path, $methods, $callback)
     {
         if (empty($path) || empty($methods) || empty($callback)) {
             throw new \Exception("添加路由失败，参数为空");
@@ -167,7 +167,8 @@ abstract class RouterAbstract implements RouterInterface
      */
     final public static function add($method, string $path, $callback, $other = [])
     {
-        $res = static::checkRoute(trim($path), $method, $callback);
+        $path = trim($path);
+        $res = static::checkRoute($path, $method, $callback);
         if ($res['callback'] instanceof \Closure) {
             static::$hasClosure = true;
             $entryId = md5(microtime(true) * 10000 + mt_rand(1000, 9999));
@@ -183,12 +184,7 @@ abstract class RouterAbstract implements RouterInterface
             }
         } else {
             // 正则表达式
-            $char = $res['path'][2];
-            $dd = preg_match('/[a-zA-Z0-9]/', $char);
-            if ($dd === false || $dd === 0) {
-                // 没有匹配到
-                $char = '/';
-            }
+            $char = static::getTopKey($path);
             foreach ($res['methods'] as $method) {
                 if (isset(static::$routes['regexp'][$method][$char][$res['path']]) && static::$routes['regexp'][$method][$char][$res['path']] !== $entryId) {
                     throw new \Exception(sprintf("路由规则[%s]已存在但是对应回调不一致", $path));
@@ -200,6 +196,13 @@ abstract class RouterAbstract implements RouterInterface
             $res['methods'] = array_merge($res['methods'], static::$routes['entry'][$entryId][0]);
         }
         static::$routes['entry'][$entryId] = [array_values(array_unique($res['methods'])), $res['callback'], $other];
+    }
+
+    final protected static function getTopKey($route)
+    {
+        $route = str_replace(['[', ']', '{', '}'], '`', $route);
+        $top = trim(substr($route, 0, intval(stripos($route, '`'))), '/');
+        return empty($top) ? '/' : $top;
     }
 
     /**
@@ -258,7 +261,7 @@ abstract class RouterAbstract implements RouterInterface
             return $response;
         } else {
             // 正则
-            $dd = $requestPath[1];
+            $dd = array_values(explode('/', trim($requestPath, '/')))[0];
             if (isset(static::$routes['regexp'][$requestMethod][$dd])) {
                 $foreach = array_merge(static::$routes['regexp'][$requestMethod][$dd],
                     static::$routes['regexp'][$requestMethod]['/'] ?? []);
@@ -284,9 +287,11 @@ abstract class RouterAbstract implements RouterInterface
                 }
             }
         }
+        if (!isset($dd)) {
+            $dd = array_values(explode('/', trim($requestPath, '/')))[0];
+        }
         // response method not allow
         foreach (static::$routes['regexp'] as $method => $routes) {
-            $dd = $requestPath[1];
             if (isset($routes[$dd]) && !empty($routes[$dd])) {
                 foreach ($routes[$dd] as $route => $entryId) {
                     if (static::isMatched($route, $requestPath) !== false) {
