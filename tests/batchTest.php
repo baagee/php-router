@@ -84,7 +84,19 @@ $list = [
         'route' => '/article/{article_id}',
         'callback' => sprintf("%s@%s", Article::class, 'delete'),
         'method' => 'delete',
-        'check' => ['/article/123', 'delete', 'ok']
+        'check' => ['/article/12 3', 'delete', '404']
+    ],
+    [
+        'route' => '/article/{article_id}/delete',
+        'callback' => sprintf("%s@%s", Article::class, 'delete'),
+        'method' => 'delete',
+        'check' => [['/article/12345/delete', 'delete', 'ok'],['/article/12345/deleted', 'delete', '404']]
+    ],
+    [
+        'route' => '/article/delete/{article_id}',
+        'callback' => sprintf("%s@%s", Article::class, 'delete'),
+        'method' => 'delete',
+        'check' => [['/article/delete/12345', 'delete', 'ok'],['/article/deleted/12345', 'delete', '404']]
     ],
     [
         'route' => '/',
@@ -115,13 +127,19 @@ $list = [
         'route' => '/car/{car_id}',
         'callback' => sprintf("%s@%s", Car::class, 'detail'),
         'method' => 'get',
-        'check' => [['/car/123', 'get', 'ok'], ['/car/asd/asd', 'put', '405']]
+        'check' => [['/car/123', 'get', 'ok'], ['/car/asd/asd', 'put', '404']]
+    ],
+    [
+        'route' => '/car[s/{car_id}]',
+        'callback' => sprintf("%s@%s", Car::class, 'detail'),
+        'method' => 'get',
+        'check' => [['/cars/123', 'get', 'ok'],['/car', 'get', 'ok']]
     ],
     [
         'route' => '/car_info/{car_id}',
         'callback' => sprintf("%s@%s", Car::class, 'detail'),
         'method' => 'get',
-        'check' => [['/car_info/123', 'get', 'ok'], ['/car/asd/asd', 'put', '405']]
+        'check' => [['/car_info/123', 'get', 'ok'], ['/car/asd/asd', 'put', '404']]
     ],
     [
         'route' => '/car',
