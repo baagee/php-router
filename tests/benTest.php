@@ -30,7 +30,7 @@ $list = [];
 $ms = [
     'get', 'post', 'put', 'delete'
 ];
-for ($i = 0; $i <= 10000; $i++) {
+for ($i = 0; $i <= 1000; $i++) {
     $u = randomStr(mt_rand(5, 15));
     $m = $ms[mt_rand(0, 3)];
     $list[] = [
