@@ -84,19 +84,19 @@ $list = [
         'route' => '/article/{article_id}',
         'callback' => sprintf("%s@%s", Article::class, 'delete'),
         'method' => 'delete',
-        'check' => ['/article/12 3', 'delete', '404']
+        'check' => ['/article/12 3', 'delete', 'ok']
     ],
     [
         'route' => '/article/{article_id}/delete',
         'callback' => sprintf("%s@%s", Article::class, 'delete'),
         'method' => 'delete',
-        'check' => [['/article/12345/delete', 'delete', 'ok'],['/article/12345/deleted', 'delete', '404']]
+        'check' => [['/article/12 345/delete', 'delete', 'ok'], ['/article/12345/deleted', 'delete', '404']]
     ],
     [
         'route' => '/article/delete/{article_id}',
         'callback' => sprintf("%s@%s", Article::class, 'delete'),
         'method' => 'delete',
-        'check' => [['/article/delete/12345', 'delete', 'ok'],['/article/deleted/12345', 'delete', '404']]
+        'check' => [['/article/delete/12345', 'delete', 'ok'], ['/article/deleted/12345', 'delete', '404']]
     ],
     [
         'route' => '/',
@@ -108,13 +108,13 @@ $list = [
         'route' => '/[{id}]',
         'callback' => sprintf("%s@%s", Article::class, 'list'),
         'method' => 'get',
-        'check' => [['/', 'get', 'ok'],['/fsdfs', 'get', 'ok']]
+        'check' => [['/', 'get', 'ok'], ['/fsdfs', 'get', 'ok']]
     ],
     [
         'route' => '/{id}',
         'callback' => sprintf("%s@%s", Article::class, 'list'),
         'method' => 'get',
-        'check' => [['/', 'get', 'ok'],['/4444555', 'get', 'ok']]
+        'check' => [['/', 'get', 'ok'], ['/4444555', 'get', 'ok']]
     ],
     // Car
     [
@@ -130,10 +130,10 @@ $list = [
         'check' => [['/car/123', 'get', 'ok'], ['/car/asd/asd', 'put', '404']]
     ],
     [
-        'route' => '/car[s/{car_id}]',
+        'route' => '/car[/{car_id}]',
         'callback' => sprintf("%s@%s", Car::class, 'detail'),
         'method' => 'get',
-        'check' => [['/cars/123', 'get', 'ok'],['/car', 'get', 'ok']]
+        'check' => [['/car/123', 'get', 'ok'], ['/car', 'get', 'ok']]
     ],
     [
         'route' => '/car_info/{car_id}',
@@ -195,7 +195,7 @@ foreach ($list as $item) {
 // 匹配并验证
 function check($path, $method, $callback, $expect)
 {
-    echo sprintf("method:%s\t path:%s\t callback:%s" . PHP_EOL,$method, $path,  $callback);
+    echo sprintf("method:%s\t path:%s\t callback:%s" . PHP_EOL, $method, $path, $callback);
     $ret = \BaAGee\Router\Router::dispatch($path, $method);
     if ($ret === $expect) {
         echo "Check [SUCCESS] 👌 Response " . $ret . PHP_EOL;

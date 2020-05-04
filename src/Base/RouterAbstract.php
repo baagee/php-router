@@ -142,7 +142,7 @@ abstract class RouterAbstract implements RouterInterface
         $res2 = strpos($path, '{') !== false && strpos($path, '}') !== false;
         if ($res1 || $res2) {
             // 路由规则使用了正则表达式，转化为标准正则
-            $path = preg_replace('`\{(\S+?)\}`', '(?<$1>[^/?&\s]+?)', str_replace(['[', ']', '/'], ['(?:', ')?', '\/'], $path));
+            $path = preg_replace('`\{(\S+?)\}`', '(?<$1>[^/?&]+?)', str_replace(['[', ']', '/'], ['(?:', ')?', '\/'], $path));
             $isStatic = false;
         } else {
             // 没有正则表达式
@@ -155,6 +155,19 @@ abstract class RouterAbstract implements RouterInterface
         }
         static::checkCallbackType($callback);
         return compact('path', 'methods', 'callback', 'isStatic');
+    }
+
+    /**
+     * 获取路由固定前缀
+     * @param $route
+     * @return mixed|string
+     */
+    final protected static function getTopKey($route)
+    {
+        $route = str_replace(['[', ']', '{', '}'], '`', $route);
+        $top = trim(substr($route, 0, intval(stripos($route, '`'))), '/');
+        $a = explode('/', $top)[0] ?? '/';
+        return empty($a) ? '/' : $a;
     }
 
     /**
@@ -184,12 +197,13 @@ abstract class RouterAbstract implements RouterInterface
             }
         } else {
             // 正则表达式
-            $char = $res['path'][2];
-            $dd = preg_match('/[a-zA-Z0-9]/', $char);
-            if ($dd === false || $dd === 0) {
-                // 没有匹配到
-                $char = '/';
-            }
+            // $char = $res['path'][2];
+            // $dd = preg_match('/[a-zA-Z0-9]/', $char);
+            // if ($dd === false || $dd === 0) {
+            //     // 没有匹配到
+            //     $char = '/';
+            // }
+            $char = self::getTopKey($path);
             foreach ($res['methods'] as $method) {
                 if (isset(static::$routes['regexp'][$method][$char][$res['path']]) && static::$routes['regexp'][$method][$char][$res['path']] !== $entryId) {
                     throw new \Exception(sprintf("路由规则[%s]已存在但是对应回调不一致", $path));
@@ -259,7 +273,7 @@ abstract class RouterAbstract implements RouterInterface
             return $response;
         } else {
             // 正则
-            $dd = $requestPath[1] ?? '';
+            $dd = array_values(explode('/', trim($requestPath, '/')))[0] ?? '/';
             if (isset(static::$routes['regexp'][$requestMethod][$dd])) {
                 $foreach = array_merge(static::$routes['regexp'][$requestMethod][$dd],
                     static::$routes['regexp'][$requestMethod]['/'] ?? []);
@@ -286,8 +300,10 @@ abstract class RouterAbstract implements RouterInterface
             }
         }
         // response method not allow
+        if (!isset($dd)) {
+            $dd = array_values(explode('/', trim($requestPath, '/')))[0] ?? '/';
+        }
         foreach (static::$routes['regexp'] as $method => $routes) {
-            $dd = $requestPath[1] ?? '';
             if (isset($routes[$dd]) && !empty($routes[$dd])) {
                 foreach ($routes[$dd] as $route => $entryId) {
                     if (static::isMatched($route, $requestPath) !== false) {
