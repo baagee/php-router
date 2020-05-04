@@ -258,6 +258,7 @@ abstract class RouterAbstract implements RouterInterface
      * @param string $pathInfo
      * @param string $requestMethod
      * @return string
+     * @throws \Exception
      */
     final public static function dispatch(string $pathInfo, string $requestMethod)
     {
@@ -300,6 +301,13 @@ abstract class RouterAbstract implements RouterInterface
             }
         }
         // response method not allow
+        foreach (static::$routes['static'] as $method => $routes) {
+            if (isset($routes[$requestPath])) {
+                if ($method != $requestMethod) {
+                    return static::responseMethodNotAllow($pathInfo, $requestMethod);
+                }
+            }
+        }
         if (!isset($dd)) {
             $dd = array_values(explode('/', trim($requestPath, '/')))[0] ?? '/';
         }
@@ -339,12 +347,13 @@ abstract class RouterAbstract implements RouterInterface
      * @param $pathInfo
      * @param $requestMethod
      * @return string
+     * @throws \Exception
      */
     final protected static function responseNotFound($pathInfo, $requestMethod)
     {
         if (static::$notFound !== null) {
             static::$routes = [];
-            static::get($pathInfo, static::$notFound);
+            static::add($requestMethod, $pathInfo, static::$notFound);
             static::$notFound = null;
             return static::dispatch($pathInfo, $requestMethod);
         } else {
@@ -363,12 +372,13 @@ abstract class RouterAbstract implements RouterInterface
      * @param $pathInfo
      * @param $requestMethod
      * @return string
+     * @throws \Exception
      */
     final protected static function responseMethodNotAllow($pathInfo, $requestMethod)
     {
         if (static::$methodNotAllow !== null) {
             static::$routes = [];
-            static::get($pathInfo, static::$methodNotAllow);
+            static::add($requestMethod, $pathInfo, static::$methodNotAllow);
             static::$methodNotAllow = null;
             return static::dispatch($pathInfo, $requestMethod);
         } else {
