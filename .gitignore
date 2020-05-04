@@ -1,2 +1,4 @@
 .idea
 vendor
+phpunit-7.0.phar
+tests/codeCoverage
